@@ -2,5 +2,9 @@
   "name": "Osumi TPV Backup API",
   "environment": "dev",
   "lang": "es",
-  "log_level": "DEBUG"
+  "log_level": "DEBUG",
+  "allow-cross-origin": true,
+  "extra": {
+    "admin_token_ttl": 28800
+  }
 }

@@ -1,0 +1,10 @@
+{
+  "status": {{ status | string }},
+  "token": {{ token | string }},
+  "expiresAt": {{ expires_at | number }},
+  "user": {
+    "publicId": {{ public_id | string }},
+    "name": {{ name | string }},
+    "email": {{ email | string }}
+  }
+}
