@@ -1,3 +1,5 @@
 /vendor/
 /ofw/
-/composer.lock
+
+/src/Config/Config_dev.json
+/src/Config/Config_prod.json

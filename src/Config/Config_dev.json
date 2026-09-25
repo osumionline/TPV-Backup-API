@@ -1,6 +1,11 @@
 {
-	"base_url": "https://composer.osumi.dev/",
-	"extra": {
-		"key": "boooo"
-	}
+  "db": {
+    "driver": "mysql",
+    "host": "localhost",
+    "user": "tpv_backup",
+    "pass": "TU_PASSWORD",
+    "name": "tpv_backup",
+    "charset": "utf8mb4",
+    "collate": "utf8mb4_unicode_ci"
+  }
 }

@@ -11,6 +11,5 @@ Options +FollowSymLinks +ExecCGI
 	RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
 
 	RewriteCond %{REQUEST_FILENAME} !-f
-	# Redirigimos todo al controlador frontal
 	RewriteRule ^(.*)$ index.php [QSA,L]
 </IfModule>

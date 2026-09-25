@@ -1,9 +1,13 @@
 {
-  "name": "osumionline/new",
-  "description": "Aplicación esqueleto basada en Osumi Framework.",
+  "name": "osumionline/tpv-backup-api",
+  "description": "API backend de Osumi TPV Backup.",
   "type": "project",
-  "keywords": ["osumi", "framework", "skeleton"],
-  "homepage": "https://github.com/osumionline/new",
+  "keywords": [
+    "osumi",
+    "tpv",
+    "backup"
+  ],
+  "homepage": "https://github.com/osumionline/TPV-Backup-API",
   "license": "MIT",
   "authors": [
     {
@@ -13,8 +17,9 @@
     }
   ],
   "require": {
-    "php": ">=8.2",
-    "osumionline/framework": "^9.4.0"
+    "php": ">=8.5",
+    "osumionline/framework": "^9.8.3",
+    "osumionline/plugin-token": "^3.0"
   },
   "autoload": {
     "psr-4": {
