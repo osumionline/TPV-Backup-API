@@ -12,6 +12,8 @@ use Osumi\OsumiFramework\App\Module\Api\Admin\Me\MeComponent;
 
 ORoute::prefix('/api', function(): void {
   ORoute::get('/health', HealthComponent::class);
-  ORoute::post('/admin/login', LoginComponent::class);
-  ORoute::get('/admin/me', MeComponent::class, [AdminAuthFilter::class]);
+  ORoute::prefix('/admin', function(): void {
+    ORoute::post('/login', LoginComponent::class);
+    ORoute::get('/me',     MeComponent::class, [AdminAuthFilter::class]);
+  });
 });

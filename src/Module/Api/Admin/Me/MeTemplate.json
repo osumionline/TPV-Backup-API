@@ -1,8 +1,8 @@
 {
-  "status": {{ status | string }},
+  "status": {{ status | plain }},
   "user": {
-    "publicId": {{ public_id | string }},
-    "name": {{ name | string }},
-    "email": {{ email | string }}
+    "publicId": {{ public_id | plain }},
+    "name": {{ name | plain }},
+    "email": {{ email | plain }}
   }
 }

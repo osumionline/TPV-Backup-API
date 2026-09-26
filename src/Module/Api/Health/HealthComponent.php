@@ -9,10 +9,10 @@ use Osumi\OsumiFramework\Core\OComponent;
 use Osumi\OsumiFramework\Web\ORequest;
 
 class HealthComponent extends OComponent {
-  public string $status = 'ok';
+  public string $status   = 'ok';
   public string $database = 'ok';
 
-  public function run(ORequest $req): void {
+  public function run(): void {
     global $core;
 
     try {
@@ -21,18 +21,18 @@ class HealthComponent extends OComponent {
       }
 
       $connection = $core->db_container->getConnection(
-        $core->config->getDB('driver') ?? 'mysql',
-        $core->config->getDB('host') ?? '',
-        $core->config->getDB('user') ?? '',
-        $core->config->getDB('pass') ?? '',
-        $core->config->getDB('name') ?? '',
+        $core->config->getDB('driver')  ?? 'mysql',
+        $core->config->getDB('host')    ?? '',
+        $core->config->getDB('user')    ?? '',
+        $core->config->getDB('pass')    ?? '',
+        $core->config->getDB('name')    ?? '',
         $core->config->getDB('charset') ?? 'utf8mb4'
       );
 
       $connection['link']->query('SELECT 1');
     }
     catch (Throwable) {
-      $this->status = 'error';
+      $this->status   = 'error';
       $this->database = 'error';
 
       $core->setHttpStatus(503);

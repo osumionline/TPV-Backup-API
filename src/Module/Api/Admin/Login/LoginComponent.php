@@ -11,12 +11,12 @@ use Osumi\OsumiFramework\App\Service\AdminAuthService;
 class LoginComponent extends OComponent {
   private ?AdminAuthService $auth_service = null;
 
-  public string $status = 'error';
-  public string $token = '';
-  public int $expires_at = 0;
-  public string $public_id = '';
-  public string $name = '';
-  public string $email = '';
+  public string $status     = 'error';
+  public string $token      = '';
+  public int    $expires_at = 0;
+  public string $public_id  = '';
+  public string $name       = '';
+  public string $email      = '';
 
   public function __construct() {
     parent::__construct();
@@ -40,11 +40,11 @@ class LoginComponent extends OComponent {
 
     $admin = $result['admin'];
 
-    $this->status = 'ok';
-    $this->token = $result['token'];
+    $this->status     = 'ok';
+    $this->token      = $result['token'];
     $this->expires_at = $result['expires_at'];
-    $this->public_id = $admin->public_id ?? '';
-    $this->name = $admin->name ?? '';
-    $this->email = $admin->email ?? '';
+    $this->public_id  = $admin->public_id ?? '';
+    $this->name       = $admin->name ?? '';
+    $this->email      = $admin->email ?? '';
   }
 }
