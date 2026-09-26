@@ -1,0 +1,13 @@
+{
+  "publicId": {{ subscription.public_id | plain }},
+  "name": {{ subscription.name | plain }},
+  "contactEmail": {{ subscription.contact_email | plain }},
+  "active": {{ subscription.active | bool }},
+  "status": {{ status | plain }},
+  "expiresAt": {{ subscription.expires_at | date("Y-m-d") }},
+  "maxInstallations": {{ subscription.max_installations | number }},
+  "maxBackupsPerInstallation": {{ subscription.max_backups_per_installation | number }},
+  "installationCount": {{ installation_count | number }},
+  "createdAt": {{ subscription.created_at | date("Y-m-d H:i:s") }},
+  "updatedAt": {{ subscription.updated_at | date("Y-m-d H:i:s") }}
+}
