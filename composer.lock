@@ -8,25 +8,25 @@
     "packages": [
         {
             "name": "osumionline/framework",
-            "version": "9.8.3",
+            "version": "9.8.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/osumionline/framework.git",
-                "reference": "6fe2cc2326204d41fec5f3006eed7b38404f6d2d"
+                "reference": "ba48bf5a489246cba228e0d0fd224cb6281993d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/osumionline/framework/zipball/6fe2cc2326204d41fec5f3006eed7b38404f6d2d",
-                "reference": "6fe2cc2326204d41fec5f3006eed7b38404f6d2d",
+                "url": "https://api.github.com/repos/osumionline/framework/zipball/ba48bf5a489246cba228e0d0fd224cb6281993d8",
+                "reference": "ba48bf5a489246cba228e0d0fd224cb6281993d8",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "php": ">=8.2"
+                "php": ">=8.5"
             },
             "type": "library",
             "extra": {
-                "version-description": "Corrección al usar hacer consultas a BD con valores NULL, mejoras internas y correcciones de seguridad."
+                "version-description": "Cambios en rutas para permitir anidamiento con prefix y group. Nuevo caso 401 para HttpStatus."
             },
             "autoload": {
                 "psr-4": {
@@ -54,9 +54,9 @@
             ],
             "support": {
                 "issues": "https://github.com/osumionline/framework/issues",
-                "source": "https://github.com/osumionline/framework/tree/v9.8.3"
+                "source": "https://github.com/osumionline/framework/tree/v9.8.4"
             },
-            "time": "2026-05-04T20:36:22+00:00"
+            "time": "2026-09-26T10:38:16+00:00"
         },
         {
             "name": "osumionline/plugin-token",
