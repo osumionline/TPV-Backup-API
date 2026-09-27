@@ -115,4 +115,15 @@ class SubscriptionService extends OService {
 
     return $subscription;
   }
+
+  /**
+ * Deletes an existing subscription.
+ *
+ * @param Subscription $subscription Subscription to delete.
+ *
+ * @return bool True when the subscription was deleted successfully.
+ */
+  public function delete(Subscription $subscription): bool {
+    return $subscription->delete();
+  }
 }

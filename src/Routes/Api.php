@@ -13,6 +13,7 @@ use Osumi\OsumiFramework\App\Module\Api\Admin\Subscriptions\GetSubscriptions\Get
 use Osumi\OsumiFramework\App\Module\Api\Admin\Subscriptions\CreateSubscription\CreateSubscriptionComponent;
 use Osumi\OsumiFramework\App\Module\Api\Admin\Subscriptions\UpdateSubscription\UpdateSubscriptionComponent;
 use Osumi\OsumiFramework\App\Module\Api\Admin\Subscriptions\SetSubscriptionActive\SetSubscriptionActiveComponent;
+use Osumi\OsumiFramework\App\Module\Api\Admin\Subscriptions\DeleteSubscription\DeleteSubscriptionComponent;
 
 ORoute::prefix('/api', function(): void {
   ORoute::get('/health', HealthComponent::class);
@@ -26,6 +27,7 @@ ORoute::prefix('/api', function(): void {
       ORoute::post('/create', CreateSubscriptionComponent::class, [AdminAuthFilter::class]);
       ORoute::post('/update', UpdateSubscriptionComponent::class, [AdminAuthFilter::class]);
       ORoute::post('/set-active', SetSubscriptionActiveComponent::class, [AdminAuthFilter::class]);
+      ORoute::post('/delete', DeleteSubscriptionComponent::class, [AdminAuthFilter::class]);
     });
   });
 });
