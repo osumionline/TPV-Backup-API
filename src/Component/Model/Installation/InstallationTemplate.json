@@ -1,0 +1,10 @@
+{
+  "publicId": {{ installation.public_id | plain }},
+  "subscriptionPublicId": {{ subscription_public_id | plain }},
+  "subscriptionName": {{ subscription_name | plain }},
+  "name": {{ installation.name | plain }},
+  "active": {{ installation.active | bool }},
+  "lastSeenAt": {{ installation.last_seen_at | date("Y-m-d H:i:s") }},
+  "createdAt": {{ installation.created_at | date("Y-m-d H:i:s") }},
+  "updatedAt": {{ installation.updated_at | date("Y-m-d H:i:s") }}
+}

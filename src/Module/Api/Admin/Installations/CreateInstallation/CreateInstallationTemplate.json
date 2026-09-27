@@ -1,0 +1,9 @@
+{
+  "status": {{ status | plain }},
+  "publicId": {{ public_id | plain }},
+  "credential": {
+    "keyId": {{ key_id | plain }},
+    "secret": {{ secret | plain }}
+  },
+  "message": {{ message | plain }}
+}
