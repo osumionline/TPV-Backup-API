@@ -18,6 +18,12 @@ class SubscriptionService extends OService {
     ]);
   }
 
+  public function getByPublicId(string $public_id): ?Subscription {
+    return Subscription::findOne([
+      'public_id' => $public_id
+    ]);
+  }
+
   public function create(
     string $name,
     ?string $contact_email,
@@ -30,6 +36,24 @@ class SubscriptionService extends OService {
     $subscription->name = $name;
     $subscription->contact_email = $contact_email;
     $subscription->active = true;
+    $subscription->expires_at = $expires_at;
+    $subscription->max_installations = $max_installations;
+    $subscription->max_backups_per_installation = $max_backups_per_installation;
+    $subscription->save();
+
+    return $subscription;
+  }
+
+  public function update(
+    Subscription $subscription,
+    string $name,
+    ?string $contact_email,
+    ?string $expires_at,
+    int $max_installations,
+    int $max_backups_per_installation
+  ): Subscription {
+    $subscription->name = $name;
+    $subscription->contact_email = $contact_email;
     $subscription->expires_at = $expires_at;
     $subscription->max_installations = $max_installations;
     $subscription->max_backups_per_installation = $max_backups_per_installation;
