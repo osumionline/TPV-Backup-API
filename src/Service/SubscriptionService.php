@@ -10,7 +10,9 @@ use Osumi\OsumiFramework\App\Utils\Uuid;
 
 class SubscriptionService extends OService {
   /**
-   * @return Subscription[]
+   * Gets all subscriptions ordered by name.
+   *
+   * @return Subscription[] Subscription list.
    */
   public function getAll(): array {
     return Subscription::all([
@@ -18,12 +20,30 @@ class SubscriptionService extends OService {
     ]);
   }
 
+  /**
+   * Gets a subscription by its public identifier.
+   *
+   * @param string $public_id Subscription public identifier.
+   *
+   * @return Subscription|null Subscription or null when it does not exist.
+   */
   public function getByPublicId(string $public_id): ?Subscription {
     return Subscription::findOne([
       'public_id' => $public_id
     ]);
   }
 
+  /**
+   * Creates a new subscription.
+   *
+   * @param string      $name                         Subscription name.
+   * @param string|null $contact_email                Contact email.
+   * @param string|null $expires_at                   Expiration date.
+   * @param int         $max_installations            Maximum installations.
+   * @param int         $max_backups_per_installation Maximum backups per installation.
+   *
+   * @return Subscription Created subscription.
+   */
   public function create(
     string $name,
     ?string $contact_email,
@@ -44,6 +64,18 @@ class SubscriptionService extends OService {
     return $subscription;
   }
 
+  /**
+   * Updates the editable data of an existing subscription.
+   *
+   * @param Subscription $subscription                 Subscription to update.
+   * @param string       $name                         Subscription name.
+   * @param string|null  $contact_email                Contact email.
+   * @param string|null  $expires_at                   Expiration date.
+   * @param int          $max_installations            Maximum installations.
+   * @param int          $max_backups_per_installation Maximum backups per installation.
+   *
+   * @return Subscription Updated subscription.
+   */
   public function update(
     Subscription $subscription,
     string $name,
@@ -57,6 +89,28 @@ class SubscriptionService extends OService {
     $subscription->expires_at = $expires_at;
     $subscription->max_installations = $max_installations;
     $subscription->max_backups_per_installation = $max_backups_per_installation;
+    $subscription->save();
+
+    return $subscription;
+  }
+
+  /**
+   * Enables or disables an existing subscription.
+   *
+   * @param Subscription $subscription Subscription to update.
+   * @param bool         $active       New active state.
+   *
+   * @return Subscription Updated subscription.
+   */
+  public function setActive(
+    Subscription $subscription,
+    bool $active
+  ): Subscription {
+    if ($subscription->active === $active) {
+      return $subscription;
+    }
+
+    $subscription->active = $active;
     $subscription->save();
 
     return $subscription;

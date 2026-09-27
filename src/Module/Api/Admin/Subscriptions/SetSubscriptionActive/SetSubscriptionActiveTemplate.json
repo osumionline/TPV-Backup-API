@@ -1,0 +1,6 @@
+{
+  "status": {{ status | plain }},
+  "publicId": {{ public_id | plain }},
+  "active": {{ active | bool }},
+  "message": {{ message | plain }}
+}
