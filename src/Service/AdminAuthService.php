@@ -10,6 +10,16 @@ use Osumi\OsumiFramework\Plugins\OToken;
 use Osumi\OsumiFramework\App\Model\AdminUser;
 
 class AdminAuthService extends OService {
+  /**
+   * Authenticates an administrator and generates its access token.
+   *
+   * @param string $email    Administrator email.
+   * @param string $password Administrator password.
+   *
+   * @return array|null Authentication data or null when the credentials are invalid.
+   *
+   * @throws RuntimeException When the administrator token secret is not configured.
+   */
   public function login(string $email, string $password): ?array {
     $email = strtolower(trim($email));
 

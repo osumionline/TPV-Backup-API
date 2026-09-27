@@ -13,6 +13,13 @@ class MeComponent extends OComponent {
   public string $name      = '';
   public string $email     = '';
 
+  /**
+   * Loads the authenticated administrator data from the authentication filter.
+   *
+   * @param ORequest $req Current request.
+   *
+   * @return void
+   */
   public function run(ORequest $req): void {
     $auth = $req->getFilter('AdminAuth');
 

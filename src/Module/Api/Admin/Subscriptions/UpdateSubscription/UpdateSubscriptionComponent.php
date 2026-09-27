@@ -17,12 +17,22 @@ class UpdateSubscriptionComponent extends OComponent {
   public ?string $public_id = null;
   public string $message = '';
 
+  /**
+   * Initializes component dependencies.
+   */
   public function __construct() {
     parent::__construct();
 
     $this->subscription_service = inject(SubscriptionService::class);
   }
 
+  /**
+   * Updates an existing subscription.
+   *
+   * @param UpdateSubscriptionDTO $dto Subscription data.
+   *
+   * @return void
+   */
   public function run(UpdateSubscriptionDTO $dto): void {
     global $core;
 

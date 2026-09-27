@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace Osumi\OsumiFramework\App\Utils;
 
 class Uuid {
+  /**
+   * Generates a random UUID version 4.
+   *
+   * @return string Generated UUID.
+   */
   public static function v4(): string {
     $data = random_bytes(16);
 

@@ -9,10 +9,22 @@ use Osumi\OsumiFramework\App\Model\AdminUser;
 use Osumi\OsumiFramework\App\Utils\Uuid;
 
 class CreateAdminTask extends OTask {
+  /**
+   * Gets the task description shown by the CLI.
+   *
+   * @return string Task description.
+   */
   public function __toString() {
     return 'createAdmin: Crea un usuario administrador de TPV Backup';
   }
 
+  /**
+   * Creates a new administrator from the provided CLI options.
+   *
+   * @param array $options CLI options.
+   *
+   * @return void
+   */
   public function run(array $options = []): void {
     $email = isset($options['email']) ? trim((string) $options['email']) : '';
     $name = isset($options['name']) ? trim((string) $options['name']) : '';

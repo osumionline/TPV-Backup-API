@@ -18,11 +18,21 @@ class LoginComponent extends OComponent {
   public string $name       = '';
   public string $email      = '';
 
+  /**
+   * Initializes component dependencies.
+   */
   public function __construct() {
     parent::__construct();
     $this->auth_service = inject(AdminAuthService::class);
   }
 
+  /**
+   * Authenticates an administrator.
+   *
+   * @param AdminLoginDTO $dto Login request data.
+   *
+   * @return void
+   */
   public function run(AdminLoginDTO $dto): void {
     global $core;
 

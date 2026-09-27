@@ -12,6 +12,11 @@ class HealthComponent extends OComponent {
   public string $status   = 'ok';
   public string $database = 'ok';
 
+  /**
+   * Checks the application and database health.
+   *
+   * @return void
+   */
   public function run(): void {
     global $core;
 

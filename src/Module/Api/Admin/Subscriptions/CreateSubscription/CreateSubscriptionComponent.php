@@ -16,12 +16,22 @@ class CreateSubscriptionComponent extends OComponent {
   public ?string $public_id = null;
   public string $message = '';
 
+  /**
+   * Initializes component dependencies.
+   */
   public function __construct() {
     parent::__construct();
 
     $this->subscription_service = inject(SubscriptionService::class);
   }
 
+  /**
+   * Creates a new subscription.
+   *
+   * @param CreateSubscriptionDTO $dto Subscription data.
+   *
+   * @return void
+   */
   public function run(CreateSubscriptionDTO $dto): void {
     global $core;
 

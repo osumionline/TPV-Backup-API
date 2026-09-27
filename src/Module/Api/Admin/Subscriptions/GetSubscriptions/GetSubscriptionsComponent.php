@@ -14,6 +14,9 @@ class GetSubscriptionsComponent extends OComponent {
   public string $status = 'ok';
   public ?SubscriptionListComponent $list = null;
 
+  /**
+   * Initializes component dependencies.
+   */
   public function __construct() {
     parent::__construct();
 
@@ -21,6 +24,11 @@ class GetSubscriptionsComponent extends OComponent {
     $this->list = new SubscriptionListComponent();
   }
 
+  /**
+   * Loads all subscriptions for the administration panel.
+   *
+   * @return void
+   */
   public function run(): void {
     $this->list->list = $this->subscription_service->getAll();
   }

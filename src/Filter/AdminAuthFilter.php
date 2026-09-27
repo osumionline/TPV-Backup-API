@@ -9,6 +9,14 @@ use Osumi\OsumiFramework\Plugins\OToken;
 use Osumi\OsumiFramework\App\Model\AdminUser;
 
 class AdminAuthFilter {
+  /**
+   * Validates an administrator Bearer token and returns its authenticated context.
+   *
+   * @param array $params  Route parameters.
+   * @param array $headers Request headers.
+   *
+   * @return array Authentication result.
+   */
   public static function handle(array $params, array $headers): array {
     global $core;
 

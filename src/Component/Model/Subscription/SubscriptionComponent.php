@@ -13,6 +13,11 @@ class SubscriptionComponent extends OComponent {
   public string $status = 'active';
   public int $installation_count = 0;
 
+  /**
+   * Calculates the subscription status and its current installation count.
+   *
+   * @return void
+   */
   public function run(): void {
     if (is_null($this->subscription) || is_null($this->subscription->id)) {
       return;
