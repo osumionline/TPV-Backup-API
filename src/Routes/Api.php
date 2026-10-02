@@ -20,6 +20,8 @@ use Osumi\OsumiFramework\App\Module\Api\Admin\Installations\CreateInstallation\C
 use Osumi\OsumiFramework\App\Module\Api\Admin\Installations\UpdateInstallation\UpdateInstallationComponent;
 use Osumi\OsumiFramework\App\Module\Api\Admin\Installations\SetInstallationActive\SetInstallationActiveComponent;
 use Osumi\OsumiFramework\App\Module\Api\Admin\Installations\DeleteInstallation\DeleteInstallationComponent;
+use Osumi\OsumiFramework\App\Module\Api\Admin\Installations\RevokeInstallationCredential\RevokeInstallationCredentialComponent;
+use Osumi\OsumiFramework\App\Module\Api\Admin\Installations\RotateInstallationCredential\RotateInstallationCredentialComponent;
 
 ORoute::prefix('/api', function(): void {
   ORoute::get('/health', HealthComponent::class);
@@ -61,6 +63,8 @@ ORoute::prefix('/api', function(): void {
         ORoute::post('/update', UpdateInstallationComponent::class);
         ORoute::post('/set-active', SetInstallationActiveComponent::class);
         ORoute::post('/delete', DeleteInstallationComponent::class);
+        ORoute::post('/revoke-credential', RevokeInstallationCredentialComponent::class);
+        ORoute::post('/rotate-credential', RotateInstallationCredentialComponent::class);
       },
       [
         OMiddleware::PHASE_BEFORE => [

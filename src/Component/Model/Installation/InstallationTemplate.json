@@ -5,6 +5,10 @@
   "name": {{ installation.name | plain }},
   "active": {{ installation.active | bool }},
   "lastSeenAt": {{ installation.last_seen_at | date("Y-m-d H:i:s") }},
+  "hasActiveCredential": {{ has_active_credential | bool }},
+  "credentialKeyId": {{ credential_key_id | plain }},
+  "credentialLastUsedAt": {{ credential_last_used_at | date("Y-m-d H:i:s") }},
+  "credentialCreatedAt": {{ credential_created_at | date("Y-m-d H:i:s") }},
   "createdAt": {{ installation.created_at | date("Y-m-d H:i:s") }},
   "updatedAt": {{ installation.updated_at | date("Y-m-d H:i:s") }}
 }

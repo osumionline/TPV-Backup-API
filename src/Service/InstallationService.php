@@ -163,7 +163,7 @@ class InstallationService extends OService {
         );
       }
 
-      $credentials = InstallationCredential::all([
+      $credentials = InstallationCredential::where([
         'id_installation' => $installation->id
       ]);
 
