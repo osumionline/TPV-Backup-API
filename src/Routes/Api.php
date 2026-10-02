@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Osumi\OsumiFramework\Routes;
 
 use Osumi\OsumiFramework\Routing\ORoute;
+use Osumi\OsumiFramework\Core\OMiddleware;
 use Osumi\OsumiFramework\App\Middleware\AdminAuthMiddleware;
 use Osumi\OsumiFramework\App\Module\Api\Health\HealthComponent;
 use Osumi\OsumiFramework\App\Module\Api\Admin\Login\LoginComponent;
@@ -22,19 +23,44 @@ ORoute::prefix('/api', function(): void {
 
   ORoute::prefix('/admin', function(): void {
     ORoute::post('/login', LoginComponent::class);
-    ORoute::get('/me', MeComponent::class, ['before' => [AdminAuthMiddleware::class]]);
 
-    ORoute::prefix('/subscriptions', function(): void {
-      ORoute::get('', GetSubscriptionsComponent::class, ['before' => [AdminAuthMiddleware::class]]);
-      ORoute::post('/create', CreateSubscriptionComponent::class, ['before' => [AdminAuthMiddleware::class]]);
-      ORoute::post('/update', UpdateSubscriptionComponent::class, ['before' => [AdminAuthMiddleware::class]]);
-      ORoute::post('/set-active', SetSubscriptionActiveComponent::class, ['before' => [AdminAuthMiddleware::class]]);
-      ORoute::post('/delete', DeleteSubscriptionComponent::class, ['before' => [AdminAuthMiddleware::class]]);
-    });
+    ORoute::get(
+      '/me',
+      MeComponent::class,
+      [
+        OMiddleware::PHASE_BEFORE => [
+          AdminAuthMiddleware::class
+        ]
+      ]
+    );
 
-    ORoute::prefix('/installations', function(): void {
-      ORoute::get('', GetInstallationsComponent::class, ['before' => [AdminAuthMiddleware::class]]);
-      ORoute::post('/create', CreateInstallationComponent::class, ['before' => [AdminAuthMiddleware::class]]);
-    });
+    ORoute::prefix(
+      '/subscriptions',
+      function(): void {
+        ORoute::get('', GetSubscriptionsComponent::class);
+        ORoute::post('/create', CreateSubscriptionComponent::class);
+        ORoute::post('/update', UpdateSubscriptionComponent::class);
+        ORoute::post('/set-active', SetSubscriptionActiveComponent::class);
+        ORoute::post('/delete', DeleteSubscriptionComponent::class);
+      },
+      [
+        OMiddleware::PHASE_BEFORE => [
+          AdminAuthMiddleware::class
+        ]
+      ]
+    );
+
+    ORoute::prefix(
+      '/installations',
+      function(): void {
+        ORoute::get('', GetInstallationsComponent::class);
+        ORoute::post('/create', CreateInstallationComponent::class);
+      },
+      [
+        OMiddleware::PHASE_BEFORE => [
+          AdminAuthMiddleware::class
+        ]
+      ]
+    );
   });
 });

@@ -4,91 +4,122 @@ declare(strict_types=1);
 
 namespace Osumi\OsumiFramework\App\Middleware;
 
-use Osumi\OsumiFramework\App\Filter\AdminAuthFilter;
+use Osumi\OsumiFramework\App\Model\AdminUser;
 use Osumi\OsumiFramework\Core\OMiddleware;
+use Osumi\OsumiFramework\Plugins\OToken;
+use Throwable;
 
 /**
- * Validates an administrator Bearer token and returns its authenticated context.
+ * Validates administrator authentication and publishes its context.
  */
 final class AdminAuthMiddleware {
-	/**
-	 * Handle middleware pipeline for admin authorization.
-	 *
-	 * @param string $phase Current middleware phase.
-	 * @param array<string, mixed> $data Current middleware pipeline data.
-	 *
-	 * @return array<string, mixed> Middleware result.
-	 *
-	 * @throws \UnexpectedValueException If the middleware returns invalid data.
-	 */
-	public static function handle(
-		string $phase,
-		array $data
-	): array {
-		if ($phase !== OMiddleware::PHASE_BEFORE) {
-			return [];
-		}
+  /**
+   * Handles administrator authentication during the before phase.
+   *
+   * @param string               $phase Current middleware phase.
+   * @param array<string, mixed> $data  Current middleware pipeline data.
+   *
+   * @return array<string, mixed> Middleware result.
+   */
+  public static function handle(
+    string $phase,
+    array $data
+  ): array {
+    if ($phase !== OMiddleware::PHASE_BEFORE) {
+      return [];
+    }
 
-		$params = $data['params'] ?? [];
-		$headers = $data['headers'] ?? [];
+    global $core;
 
-		if (
-			!is_array($params) ||
-			!is_array($headers)
-		) {
-			throw new \UnexpectedValueException(
-				'Legacy Filter middleware received invalid request data.'
-			);
-		}
+    $headers = $data['headers'] ?? [];
 
-		$filter = new AdminAuthFilter();
+    if (!is_array($headers)) {
+      return self::unauthorized();
+    }
 
-		$result = $filter->handle(
-			$params,
-			$headers
-		);
+    $authorization = $headers['Authorization']
+      ?? $headers['authorization']
+      ?? null;
 
-		if (!is_array($result)) {
-			throw new \UnexpectedValueException(
-				'Legacy Filter AdminAuthFilter must return an array.'
-			);
-		}
+    if (!is_string($authorization)) {
+      return self::unauthorized();
+    }
 
-		if (
-			($result['status'] ?? null) === 'ok'
-		) {
-			return [
-				'context' => $result
-			];
-		}
+    if (!preg_match('/^Bearer\s+(.+)$/i', trim($authorization), $matches)) {
+      return self::unauthorized();
+    }
 
-		$redirect = $result['return']
-			?? null;
+    $raw_token = trim($matches[1]);
 
-		if ($redirect !== null) {
-			if (
-				!is_string($redirect) ||
-				$redirect === ''
-			) {
-				throw new \UnexpectedValueException(
-					"Legacy Filter AdminAuthFilter returned an invalid redirect URL."
-				);
-			}
+    if (substr_count($raw_token, '.') !== 2) {
+      return self::unauthorized();
+    }
 
-			return [
-				'stop' => true,
-				'status_code' => 302,
-				'headers' => [
-					'Location' => $redirect
-				],
-				'message' => ''
-			];
-		}
+    $secret = $core->config->getExtra('admin_token_secret');
 
-		return [
-			'stop' => true,
-			'status_code' => 403,
-			'message' => ''
-		];
-	}
+    if (!is_string($secret) || $secret === '') {
+      return self::unauthorized();
+    }
+
+    try {
+      $token = new OToken($secret);
+
+      if (!$token->checkToken($raw_token)) {
+        return self::unauthorized();
+      }
+
+      if ($token->getParam('type') !== 'admin') {
+        return self::unauthorized();
+      }
+
+      $id = (int) $token->getParam('id');
+      $public_id = $token->getParam('public_id');
+
+      if (
+        $id <= 0 ||
+        !is_string($public_id) ||
+        $public_id === ''
+      ) {
+        return self::unauthorized();
+      }
+
+      $admin = AdminUser::findOne([
+        'id' => $id
+      ]);
+
+      if (
+        is_null($admin) ||
+        $admin->active !== true ||
+        $admin->public_id !== $public_id
+      ) {
+        return self::unauthorized();
+      }
+
+      return [
+        'context' => [
+          'status' => 'ok',
+          'id' => $admin->id,
+          'public_id' => $admin->public_id,
+          'name' => $admin->name,
+          'email' => $admin->email
+        ]
+      ];
+    }
+    catch (Throwable) {
+      return self::unauthorized();
+    }
+  }
+
+  /**
+   * Builds the middleware stop response used when authentication fails.
+   *
+   * @return array<string, mixed> Middleware stop result.
+   */
+  private static function unauthorized(): array {
+    return [
+      'stop' => true,
+      'status_code' => 403,
+      'message' => ''
+    ];
+  }
 }
