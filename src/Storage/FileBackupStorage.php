@@ -324,6 +324,22 @@ class FileBackupStorage implements BackupStorageInterface {
       );
     }
 
+    $segments = explode(
+      '/',
+      $storage_key
+    );
+
+    foreach ($segments as $segment) {
+      if (
+        $segment === '.' ||
+        $segment === '..'
+      ) {
+        throw new RuntimeException(
+          'Invalid backup storage key.'
+        );
+      }
+    }
+
     return $this->root_path
       . DIRECTORY_SEPARATOR
       . str_replace(
