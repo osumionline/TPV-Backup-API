@@ -8,12 +8,13 @@ use DateTimeImmutable;
 use DateTimeZone;
 use RuntimeException;
 use Throwable;
+use Osumi\OsumiFramework\Core\OService;
+use Osumi\OsumiFramework\ORM\ODB;
 use Osumi\OsumiFramework\App\Exception\BackupConflictException;
 use Osumi\OsumiFramework\App\Exception\InvalidOtpvPackageException;
 use Osumi\OsumiFramework\App\Model\Backup;
 use Osumi\OsumiFramework\App\Model\Installation;
 use Osumi\OsumiFramework\App\Utils\Uuid;
-use Osumi\OsumiFramework\Core\OService;
 
 class BackupService extends OService {
   private OtpvV3InspectorService $inspector_service;
@@ -46,6 +47,142 @@ class BackupService extends OService {
       'backup_id' => $backup_id
     ]);
   }
+
+  /**
+ * Gets all backups ordered from newest to oldest by client creation date.
+ *
+ * @return Backup[] Backup list.
+ */
+public function getAll(): array {
+  return Backup::all([
+    'order_by' => 'created_at_client#DESC'
+  ]);
+}
+
+/**
+ * Gets a backup by its public server identifier.
+ *
+ * @param string $public_id Backup public identifier.
+ *
+ * @return Backup|null Backup or null when it does not exist.
+ */
+public function getByPublicId(
+  string $public_id
+): ?Backup {
+  return Backup::findOne([
+    'public_id' => $public_id
+  ]);
+}
+
+/**
+ * Opens the stored backup for sequential reading.
+ *
+ * Metadata and stored file size are checked before returning the stream.
+ *
+ * @param Backup $backup Backup to open.
+ *
+ * @return resource Readable backup stream.
+ *
+ * @throws RuntimeException When the backup metadata or stored object is inconsistent.
+ */
+public function openReadStream(
+  Backup $backup
+): mixed {
+  if (
+    is_null($backup->storage_key) ||
+    is_null($backup->size_bytes)
+  ) {
+    throw new RuntimeException(
+      'Backup storage metadata is incomplete.'
+    );
+  }
+
+  if (
+    !$this->storage_service->exists(
+      $backup->storage_key
+    )
+  ) {
+    throw new RuntimeException(
+      'Backup stored file does not exist.'
+    );
+  }
+
+  $stored_size = $this->storage_service->getSize(
+    $backup->storage_key
+  );
+
+  if ($stored_size !== $backup->size_bytes) {
+    throw new RuntimeException(
+      'Backup metadata and stored file size are inconsistent.'
+    );
+  }
+
+  return $this->storage_service->openReadStream(
+    $backup->storage_key
+  );
+}
+
+/**
+ * Deletes a backup metadata record and its stored object.
+ *
+ * The database deletion remains uncommitted until the storage operation has
+ * completed. A missing stored object is tolerated so orphan metadata can be
+ * cleaned up administratively.
+ *
+ * @param Backup $backup Backup to delete.
+ *
+ * @return void
+ *
+ * @throws RuntimeException When the deletion cannot be completed.
+ */
+public function delete(
+  Backup $backup
+): void {
+  if (
+    is_null($backup->id) ||
+    is_null($backup->storage_key)
+  ) {
+    throw new RuntimeException(
+      'Backup must be persisted before deletion.'
+    );
+  }
+
+  $storage_key = $backup->storage_key;
+  $db = ODB::getInstance();
+
+  try {
+    $db->beginTransaction();
+
+    if (!$backup->delete()) {
+      throw new RuntimeException(
+        'Backup metadata could not be deleted.'
+      );
+    }
+
+    if (
+      $this->storage_service->exists(
+        $storage_key
+      )
+    ) {
+      $this->storage_service->delete(
+        $storage_key
+      );
+    }
+
+    $db->commit();
+  }
+  catch (Throwable $exception) {
+    if ($db->inTransaction()) {
+      $db->rollBack();
+    }
+
+    throw new RuntimeException(
+      'Backup could not be deleted.',
+      0,
+      $exception
+    );
+  }
+}
 
   /**
    * Inspects, stores and persists an OTPV backup.
