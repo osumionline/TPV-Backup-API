@@ -75,4 +75,54 @@ class InstallationService extends OService {
 
     return $installation;
   }
+
+  /**
+   * Updates the editable data of an installation.
+   *
+   * @param Installation $installation Installation to update.
+   * @param string       $name         New installation name.
+   *
+   * @return Installation Updated installation.
+   *
+   * @throws RuntimeException When the installation cannot be persisted.
+   */
+  public function update(
+    Installation $installation,
+    string $name
+  ): Installation {
+    $installation->name = $name;
+
+    if (!$installation->save()) {
+      throw new RuntimeException('Installation could not be updated.');
+    }
+
+    return $installation;
+  }
+
+  /**
+   * Enables or disables an installation.
+   *
+   * @param Installation $installation Installation to update.
+   * @param bool         $active       New active state.
+   *
+   * @return Installation Updated installation.
+   *
+   * @throws RuntimeException When the installation cannot be persisted.
+   */
+  public function setActive(
+    Installation $installation,
+    bool $active
+  ): Installation {
+    if ($installation->active === $active) {
+      return $installation;
+    }
+
+    $installation->active = $active;
+
+    if (!$installation->save()) {
+      throw new RuntimeException('Installation active state could not be updated.');
+    }
+
+    return $installation;
+  }
 }

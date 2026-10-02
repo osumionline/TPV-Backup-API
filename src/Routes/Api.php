@@ -17,6 +17,8 @@ use Osumi\OsumiFramework\App\Module\Api\Admin\Subscriptions\SetSubscriptionActiv
 use Osumi\OsumiFramework\App\Module\Api\Admin\Subscriptions\DeleteSubscription\DeleteSubscriptionComponent;
 use Osumi\OsumiFramework\App\Module\Api\Admin\Installations\GetInstallations\GetInstallationsComponent;
 use Osumi\OsumiFramework\App\Module\Api\Admin\Installations\CreateInstallation\CreateInstallationComponent;
+use Osumi\OsumiFramework\App\Module\Api\Admin\Installations\UpdateInstallation\UpdateInstallationComponent;
+use Osumi\OsumiFramework\App\Module\Api\Admin\Installations\SetInstallationActive\SetInstallationActiveComponent;
 
 ORoute::prefix('/api', function(): void {
   ORoute::get('/health', HealthComponent::class);
@@ -55,6 +57,8 @@ ORoute::prefix('/api', function(): void {
       function(): void {
         ORoute::get('', GetInstallationsComponent::class);
         ORoute::post('/create', CreateInstallationComponent::class);
+        ORoute::post('/update', UpdateInstallationComponent::class);
+        ORoute::post('/set-active', SetInstallationActiveComponent::class);
       },
       [
         OMiddleware::PHASE_BEFORE => [
