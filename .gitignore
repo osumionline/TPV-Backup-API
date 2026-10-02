@@ -4,3 +4,4 @@
 /public/.php-version
 /src/Config/Config_dev.json
 /src/Config/Config_prod.json
+/storage/
