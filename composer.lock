@@ -8,25 +8,32 @@
     "packages": [
         {
             "name": "osumionline/framework",
-            "version": "9.8.5",
+            "version": "9.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/osumionline/framework.git",
-                "reference": "eaa71037ccb38f90b4ca152d3814dc4f48992ac5"
+                "reference": "e4668b0d28aef3ef60bc37e38fa7cad20da0fd3a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/osumionline/framework/zipball/eaa71037ccb38f90b4ca152d3814dc4f48992ac5",
-                "reference": "eaa71037ccb38f90b4ca152d3814dc4f48992ac5",
+                "url": "https://api.github.com/repos/osumionline/framework/zipball/e4668b0d28aef3ef60bc37e38fa7cad20da0fd3a",
+                "reference": "e4668b0d28aef3ef60bc37e38fa7cad20da0fd3a",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
+                "osumionline/plugin-updater": "^1.0",
                 "php": ">=8.5"
             },
+            "require-dev": {
+                "phpunit/phpunit": "^13.3"
+            },
+            "bin": [
+                "bin/ofw-migrate"
+            ],
             "type": "library",
             "extra": {
-                "version-description": "Cambios en firma de métodos run de componentes. Nuevo pipe plain."
+                "version-description": "Corrección en la detección de rutas con Middlewares durante las migraciones."
             },
             "autoload": {
                 "psr-4": {
@@ -54,9 +61,9 @@
             ],
             "support": {
                 "issues": "https://github.com/osumionline/framework/issues",
-                "source": "https://github.com/osumionline/framework/tree/v9.8.5"
+                "source": "https://github.com/osumionline/framework/tree/v9.9.1"
             },
-            "time": "2026-09-26T21:57:48+00:00"
+            "time": "2026-10-02T09:32:13+00:00"
         },
         {
             "name": "osumionline/plugin-token",
@@ -91,6 +98,44 @@
                 "source": "https://github.com/osumionline/plugin-token/tree/v3.0.0"
             },
             "time": "2024-09-05T07:18:40+00:00"
+        },
+        {
+            "name": "osumionline/plugin-updater",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/osumionline/plugin-updater.git",
+                "reference": "1fbd12ed1b395c669ffa9d48a9e8393e5a3605ca"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/osumionline/plugin-updater/zipball/1fbd12ed1b395c669ffa9d48a9e8393e5a3605ca",
+                "reference": "1fbd12ed1b395c669ffa9d48a9e8393e5a3605ca",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^2.0",
+                "php": ">=8.5"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Osumi\\OsumiFramework\\Plugins\\OUpdater"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Osumi\\OsumiFramework\\Plugins\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Osumi Framework Composer plugin to run core migrations after framework updates.",
+            "support": {
+                "issues": "https://github.com/osumionline/plugin-updater/issues",
+                "source": "https://github.com/osumionline/plugin-updater/tree/v1.0.1"
+            },
+            "time": "2026-10-01T12:03:12+00:00"
         }
     ],
     "packages-dev": [],
@@ -103,5 +148,5 @@
         "php": ">=8.5"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }

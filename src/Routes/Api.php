@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Osumi\OsumiFramework\Routes;
 
 use Osumi\OsumiFramework\Routing\ORoute;
-use Osumi\OsumiFramework\App\Filter\AdminAuthFilter;
+use Osumi\OsumiFramework\App\Middleware\AdminAuthMiddleware;
 use Osumi\OsumiFramework\App\Module\Api\Health\HealthComponent;
 use Osumi\OsumiFramework\App\Module\Api\Admin\Login\LoginComponent;
 use Osumi\OsumiFramework\App\Module\Api\Admin\Me\MeComponent;
@@ -22,19 +22,19 @@ ORoute::prefix('/api', function(): void {
 
   ORoute::prefix('/admin', function(): void {
     ORoute::post('/login', LoginComponent::class);
-    ORoute::get('/me', MeComponent::class, [AdminAuthFilter::class]);
+    ORoute::get('/me', MeComponent::class, ['before' => [AdminAuthMiddleware::class]]);
 
     ORoute::prefix('/subscriptions', function(): void {
-      ORoute::get('', GetSubscriptionsComponent::class, [AdminAuthFilter::class]);
-      ORoute::post('/create', CreateSubscriptionComponent::class, [AdminAuthFilter::class]);
-      ORoute::post('/update', UpdateSubscriptionComponent::class, [AdminAuthFilter::class]);
-      ORoute::post('/set-active', SetSubscriptionActiveComponent::class, [AdminAuthFilter::class]);
-      ORoute::post('/delete', DeleteSubscriptionComponent::class, [AdminAuthFilter::class]);
+      ORoute::get('', GetSubscriptionsComponent::class, ['before' => [AdminAuthMiddleware::class]]);
+      ORoute::post('/create', CreateSubscriptionComponent::class, ['before' => [AdminAuthMiddleware::class]]);
+      ORoute::post('/update', UpdateSubscriptionComponent::class, ['before' => [AdminAuthMiddleware::class]]);
+      ORoute::post('/set-active', SetSubscriptionActiveComponent::class, ['before' => [AdminAuthMiddleware::class]]);
+      ORoute::post('/delete', DeleteSubscriptionComponent::class, ['before' => [AdminAuthMiddleware::class]]);
     });
 
     ORoute::prefix('/installations', function(): void {
-      ORoute::get('', GetInstallationsComponent::class, [AdminAuthFilter::class]);
-      ORoute::post('/create', CreateInstallationComponent::class, [AdminAuthFilter::class]);
+      ORoute::get('', GetInstallationsComponent::class, ['before' => [AdminAuthMiddleware::class]]);
+      ORoute::post('/create', CreateInstallationComponent::class, ['before' => [AdminAuthMiddleware::class]]);
     });
   });
 });

@@ -21,7 +21,7 @@ class MeComponent extends OComponent {
    * @return void
    */
   public function run(ORequest $req): void {
-    $auth = $req->getFilter('AdminAuth');
+    $auth = $req->getMiddleware('AdminAuth');
 
     $this->public_id = $auth['public_id'] ?? '';
     $this->name      = $auth['name'] ?? '';
