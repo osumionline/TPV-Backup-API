@@ -5,10 +5,15 @@ declare(strict_types=1);
 namespace Osumi\OsumiFramework\App\Service;
 
 use RuntimeException;
+use DomainException;
+use Throwable;
+use Osumi\OsumiFramework\Core\OService;
+use Osumi\OsumiFramework\ORM\ODB;
 use Osumi\OsumiFramework\App\Model\Installation;
 use Osumi\OsumiFramework\App\Model\Subscription;
 use Osumi\OsumiFramework\App\Utils\Uuid;
-use Osumi\OsumiFramework\Core\OService;
+use Osumi\OsumiFramework\App\Model\Backup;
+use Osumi\OsumiFramework\App\Model\InstallationCredential;
 
 class InstallationService extends OService {
   /**
@@ -124,5 +129,77 @@ class InstallationService extends OService {
     }
 
     return $installation;
+  }
+
+  /**
+   * Deletes an installation and all its credentials.
+   *
+   * Installations with registered backups cannot be deleted.
+   *
+   * @param Installation $installation Installation to delete.
+   *
+   * @return void
+   *
+   * @throws DomainException  When the installation has registered backups.
+   * @throws RuntimeException When the deletion cannot be completed.
+   */
+  public function delete(Installation $installation): void {
+    if (is_null($installation->id)) {
+      throw new RuntimeException('Installation must be persisted before deletion.');
+    }
+
+    $db = ODB::getInstance();
+
+    try {
+      $db->beginTransaction();
+
+      $backup_count = Backup::count([
+        'id_installation' => $installation->id
+      ]);
+
+      if ($backup_count > 0) {
+        throw new DomainException(
+          'Installation cannot be deleted while it has backups.'
+        );
+      }
+
+      $credentials = InstallationCredential::all([
+        'id_installation' => $installation->id
+      ]);
+
+      foreach ($credentials as $credential) {
+        if (!$credential->delete()) {
+          throw new RuntimeException(
+            'Installation credential could not be deleted.'
+          );
+        }
+      }
+
+      if (!$installation->delete()) {
+        throw new RuntimeException(
+          'Installation could not be deleted.'
+        );
+      }
+
+      $db->commit();
+    }
+    catch (DomainException $exception) {
+      if ($db->inTransaction()) {
+        $db->rollBack();
+      }
+
+      throw $exception;
+    }
+    catch (Throwable $exception) {
+      if ($db->inTransaction()) {
+        $db->rollBack();
+      }
+
+      throw new RuntimeException(
+        'Installation could not be deleted.',
+        0,
+        $exception
+      );
+    }
   }
 }
