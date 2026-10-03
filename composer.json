@@ -18,7 +18,7 @@
   ],
   "require": {
     "php": ">=8.5",
-    "osumionline/framework": "^9.9.1",
+    "osumionline/framework": "^9.10.0",
     "osumionline/plugin-token": "^3.0"
   },
   "require-dev": {
