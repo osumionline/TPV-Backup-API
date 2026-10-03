@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "osumionline/framework",
-            "version": "9.10.0",
+            "version": "9.10.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/osumionline/framework.git",
-                "reference": "29b6880a44d7d6db5cb1c0c18cf7165072a6af49"
+                "reference": "5b2b423f1e8264e013ddd89b38f1fc41079acec1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/osumionline/framework/zipball/29b6880a44d7d6db5cb1c0c18cf7165072a6af49",
-                "reference": "29b6880a44d7d6db5cb1c0c18cf7165072a6af49",
+                "url": "https://api.github.com/repos/osumionline/framework/zipball/5b2b423f1e8264e013ddd89b38f1fc41079acec1",
+                "reference": "5b2b423f1e8264e013ddd89b38f1fc41079acec1",
                 "shasum": ""
             },
             "require": {
@@ -33,7 +33,7 @@
             ],
             "type": "library",
             "extra": {
-                "version-description": "Soporte nativo para respuestas HTTP por streaming mediante OStreamResponse."
+                "version-description": "Corrección de la sincronización del estado HTTP establecido mediante OCore::setHttpStatus()."
             },
             "autoload": {
                 "psr-4": {
@@ -61,9 +61,9 @@
             ],
             "support": {
                 "issues": "https://github.com/osumionline/framework/issues",
-                "source": "https://github.com/osumionline/framework/tree/v9.10.0"
+                "source": "https://github.com/osumionline/framework/tree/v9.10.1"
             },
-            "time": "2026-10-03T17:17:59+00:00"
+            "time": "2026-10-03T21:28:16+00:00"
         },
         {
             "name": "osumionline/plugin-token",
@@ -376,16 +376,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "14.4.0",
+            "version": "14.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "9be27409ad7bedddd34ed3bc27561d47c6faea06"
+                "reference": "f1e54f06b6b4cea73cd6104ba3c0cfa0efa6d73f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/9be27409ad7bedddd34ed3bc27561d47c6faea06",
-                "reference": "9be27409ad7bedddd34ed3bc27561d47c6faea06",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/f1e54f06b6b4cea73cd6104ba3c0cfa0efa6d73f",
+                "reference": "f1e54f06b6b4cea73cd6104ba3c0cfa0efa6d73f",
                 "shasum": ""
             },
             "require": {
@@ -395,9 +395,9 @@
                 "ext-xmlwriter": "*",
                 "nikic/php-parser": "^5.9.0",
                 "php": ">=8.4",
-                "phpunit/php-text-template": "^6.0",
+                "phpunit/php-text-template": "^6.0.1",
                 "sebastian/complexity": "^6.0",
-                "sebastian/environment": "^9.3.2",
+                "sebastian/environment": "^9.3.3",
                 "sebastian/git-state": "^1.0",
                 "sebastian/lines-of-code": "^5.0.2",
                 "sebastian/version": "^7.0",
@@ -442,7 +442,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-code-coverage/issues",
                 "security": "https://github.com/sebastianbergmann/php-code-coverage/security/policy",
-                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/14.4.0"
+                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/14.4.1"
             },
             "funding": [
                 {
@@ -462,7 +462,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-09-30T12:46:01+00:00"
+            "time": "2026-10-03T14:05:38+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -615,23 +615,23 @@
         },
         {
             "name": "phpunit/php-text-template",
-            "version": "6.0.0",
+            "version": "6.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-text-template.git",
-                "reference": "a47af19f93f76aa3368303d752aa5272ca3299f4"
+                "reference": "97107691cb2b6c743b5e0c44be19e983cb337a02"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-text-template/zipball/a47af19f93f76aa3368303d752aa5272ca3299f4",
-                "reference": "a47af19f93f76aa3368303d752aa5272ca3299f4",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-text-template/zipball/97107691cb2b6c743b5e0c44be19e983cb337a02",
+                "reference": "97107691cb2b6c743b5e0c44be19e983cb337a02",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.4"
             },
             "require-dev": {
-                "phpunit/phpunit": "^13.0"
+                "phpunit/phpunit": "^13.3.6"
             },
             "type": "library",
             "extra": {
@@ -663,7 +663,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-text-template/issues",
                 "security": "https://github.com/sebastianbergmann/php-text-template/security/policy",
-                "source": "https://github.com/sebastianbergmann/php-text-template/tree/6.0.0"
+                "source": "https://github.com/sebastianbergmann/php-text-template/tree/6.0.1"
             },
             "funding": [
                 {
@@ -683,7 +683,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-02-06T04:36:37+00:00"
+            "time": "2026-10-03T04:54:24+00:00"
         },
         {
             "name": "phpunit/php-timer",
