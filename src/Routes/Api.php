@@ -24,6 +24,7 @@ use Osumi\OsumiFramework\App\Module\Api\Admin\Installations\RevokeInstallationCr
 use Osumi\OsumiFramework\App\Module\Api\Admin\Installations\RotateInstallationCredential\RotateInstallationCredentialComponent;
 use Osumi\OsumiFramework\App\Module\Api\Admin\Backups\GetBackups\GetBackupsComponent;
 use Osumi\OsumiFramework\App\Module\Api\Admin\Backups\DeleteBackup\DeleteBackupComponent;
+use Osumi\OsumiFramework\App\Module\Api\Admin\Backups\DownloadBackup\DownloadBackupComponent;
 
 ORoute::prefix('/api', function(): void {
   ORoute::get('/health', HealthComponent::class);
@@ -80,6 +81,7 @@ ORoute::prefix('/api', function(): void {
       function(): void {
         ORoute::get('', GetBackupsComponent::class);
         ORoute::post('/delete', DeleteBackupComponent::class);
+        ORoute::get('/download/:publicId', DownloadBackupComponent::class);
       },
       [
         OMiddleware::PHASE_BEFORE => [
