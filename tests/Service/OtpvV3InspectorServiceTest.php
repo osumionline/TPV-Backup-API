@@ -100,6 +100,11 @@ final class OtpvV3InspectorServiceTest extends TestCase {
     );
 
     self::assertSame(
+      'otpv3-scrypt-aes-256-gcm',
+      $result['cryptoSuite']
+    );
+
+    self::assertSame(
       '123e4567-e89b-42d3-a456-426614174000',
       $result['backupId']
     );
@@ -188,6 +193,34 @@ final class OtpvV3InspectorServiceTest extends TestCase {
   }
 
   /**
+   * Verifies that an unsupported crypto suite is rejected.
+   *
+   * @return void
+   */
+  public function testUnsupportedCryptoSuiteIsRejected(): void {
+    $manifest = $this->createManifest();
+    $manifest['cryptoSuite'] = 'otpv-v3-scrypt-aes-256-gcm';
+
+    $file_path = $this->createPackage(
+      $manifest
+    );
+
+    $service = new OtpvV3InspectorService();
+
+    $this->expectException(
+      InvalidOtpvPackageException::class
+    );
+
+    $this->expectExceptionMessage(
+      'Unsupported OTPV crypto suite.'
+    );
+
+    $service->inspect(
+      $file_path
+    );
+  }
+
+  /**
    * Creates a valid OTPV v3 public manifest.
    *
    * @return array<string, mixed> Manifest data.
@@ -200,7 +233,7 @@ final class OtpvV3InspectorServiceTest extends TestCase {
       'databaseSchemaVersion' => 1,
       'backupId' => '123e4567-e89b-42d3-a456-426614174000',
       'createdAt' => '2026-10-03T12:00:00Z',
-      'cryptoSuite' => 'otpv-v3-scrypt-aes-256-gcm',
+      'cryptoSuite' => 'otpv3-scrypt-aes-256-gcm',
       'authenticatedData' => base64_encode(
         'otpv-v3'
       ),

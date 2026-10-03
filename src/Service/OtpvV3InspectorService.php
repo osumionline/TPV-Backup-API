@@ -15,7 +15,7 @@ use Osumi\OsumiFramework\Core\OService;
 class OtpvV3InspectorService extends OService {
   private const FORMAT_VERSION = 3;
   private const APPLICATION = 'Osumi TPV Client';
-  private const CRYPTO_SUITE = 'otpv-v3-scrypt-aes-256-gcm';
+  private const CRYPTO_SUITE = 'otpv3-scrypt-aes-256-gcm';
 
   private const MANIFEST_ENTRY = 'manifest.json';
   private const PAYLOAD_ENTRY = 'payload.enc';
