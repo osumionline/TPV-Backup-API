@@ -74,7 +74,50 @@ final class CreateBackupComponentTest extends TestCase {
    * @return void
    */
   public function testRunRejectsUploadWhenNotAllowed(): void {
-    $component = $this->createComponent();
+    $installation_service =
+      $this->createInstallationServiceMock();
+
+    $backup_service =
+      $this->createBackupServiceMock();
+
+    $audit_service =
+      $this->createAuditServiceMock();
+
+    $installation_service
+      ->expects(
+        self::never()
+      )
+      ->method('getById');
+
+    $backup_service
+      ->expects(
+        self::never()
+      )
+      ->method('createFromFile');
+
+    $audit_service
+      ->expects(
+        self::never()
+      )
+      ->method('recordInstallationAction');
+
+    $component = $this->createComponent(
+      $installation_service,
+      $backup_service,
+      $audit_service
+    );
+
+    $component
+      ->expects(
+        self::never()
+      )
+      ->method('isUploadedFile');
+
+    $component
+      ->expects(
+        self::never()
+      )
+      ->method('getFileSize');
 
     $component->run(
       $this->createDto(
@@ -99,7 +142,38 @@ final class CreateBackupComponentTest extends TestCase {
    * @return void
    */
   public function testRunRejectsOversizedBackup(): void {
-    $component = $this->createComponent();
+    $installation_service =
+      $this->createInstallationServiceMock();
+
+    $backup_service =
+      $this->createBackupServiceMock();
+
+    $audit_service =
+      $this->createAuditServiceMock();
+
+    $installation_service
+      ->expects(
+        self::never()
+      )
+      ->method('getById');
+
+    $backup_service
+      ->expects(
+        self::never()
+      )
+      ->method('createFromFile');
+
+    $audit_service
+      ->expects(
+        self::never()
+      )
+      ->method('recordInstallationAction');
+
+    $component = $this->createComponent(
+      $installation_service,
+      $backup_service,
+      $audit_service
+    );
 
     $component
       ->expects(
@@ -147,9 +221,19 @@ final class CreateBackupComponentTest extends TestCase {
     $backup_service =
       $this->createBackupServiceMock();
 
+    $audit_service =
+      $this->createAuditServiceMock();
+
+    $audit_service
+      ->expects(
+        self::never()
+      )
+      ->method('recordInstallationAction');
+
     $component = $this->createComponent(
       $installation_service,
-      $backup_service
+      $backup_service,
+      $audit_service
     );
 
     $component
@@ -212,9 +296,19 @@ final class CreateBackupComponentTest extends TestCase {
     $backup_service =
       $this->createBackupServiceMock();
 
+    $audit_service =
+      $this->createAuditServiceMock();
+
+    $audit_service
+      ->expects(
+        self::never()
+      )
+      ->method('recordInstallationAction');
+
     $component = $this->createComponent(
       $installation_service,
-      $backup_service
+      $backup_service,
+      $audit_service
     );
 
     $component
@@ -232,13 +326,25 @@ final class CreateBackupComponentTest extends TestCase {
       ->willReturn(1024);
 
     $installation_service
+      ->expects(
+        self::once()
+      )
       ->method('getById')
+      ->with(10)
       ->willReturn(
         $installation
       );
 
     $backup_service
+      ->expects(
+        self::once()
+      )
       ->method('createFromFile')
+      ->with(
+        $installation,
+        '/tmp/upload.otpv',
+        'backup.otpv'
+      )
       ->willThrowException(
         new BackupConflictException(
           'Conflict.'
