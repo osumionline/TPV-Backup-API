@@ -240,6 +240,76 @@ final class BackupServiceRetentionTest extends TestCase {
   }
 
   /**
+   * Verifies that retention uses the limit configured by the subscription.
+   *
+   * @return void
+   */
+  public function testRetentionUsesConfiguredSubscriptionLimit(): void {
+    $installation = $this->createInstallation();
+
+    $backups = [
+      $this->createBackup(
+        4,
+        '2026-10-04 10:00:00'
+      ),
+      $this->createBackup(
+        2,
+        '2026-10-02 10:00:00'
+      ),
+      $this->createBackup(
+        1,
+        '2026-10-01 10:00:00'
+      ),
+      $this->createBackup(
+        3,
+        '2026-10-03 10:00:00'
+      )
+    ];
+
+    $deleted_ids = [];
+
+    $service = $this->createServiceMock(
+      3
+    );
+
+    $service
+      ->expects(
+        self::once()
+      )
+      ->method('getByInstallation')
+      ->with(
+        $installation
+      )
+      ->willReturn(
+        $backups
+      );
+
+    $service
+      ->expects(
+        self::once()
+      )
+      ->method('delete')
+      ->willReturnCallback(
+        static function(
+          Backup $backup
+        ) use (
+          &$deleted_ids
+        ): void {
+          $deleted_ids[] = $backup->id;
+        }
+      );
+
+    $service->enforceRetention(
+      $installation
+    );
+
+    self::assertSame(
+      [1],
+      $deleted_ids
+    );
+  }
+
+  /**
    * Verifies that the internal identifier breaks equal creation-date ties.
    *
    * @return void
@@ -393,6 +463,7 @@ final class BackupServiceRetentionTest extends TestCase {
     $installation = new Installation();
 
     $installation->id = 10;
+    $installation->id_subscription = 20;
     $installation->public_id =
       '8a8758ea-5052-4c71-bd77-679509addead';
 
@@ -423,18 +494,34 @@ final class BackupServiceRetentionTest extends TestCase {
   /**
    * Creates a BackupService mock without initializing real dependencies.
    *
+   * @param int $retention_limit Retention limit returned for the installation.
+   *
    * @return BackupService&MockObject Backup service mock.
    */
-  private function createServiceMock(): BackupService&MockObject {
-    return $this
+  private function createServiceMock(
+    int $retention_limit = 6
+  ): BackupService&MockObject {
+    $service = $this
       ->getMockBuilder(
         BackupService::class
       )
       ->disableOriginalConstructor()
       ->onlyMethods([
         'getByInstallation',
+        'getRetentionLimit',
         'delete'
       ])
       ->getMock();
+
+    $service
+      ->expects(
+        self::once()
+      )
+      ->method('getRetentionLimit')
+      ->willReturn(
+        $retention_limit
+      );
+
+    return $service;
   }
 }

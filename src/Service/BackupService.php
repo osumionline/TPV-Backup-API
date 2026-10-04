@@ -14,11 +14,10 @@ use Osumi\OsumiFramework\App\Exception\BackupConflictException;
 use Osumi\OsumiFramework\App\Exception\InvalidOtpvPackageException;
 use Osumi\OsumiFramework\App\Model\Backup;
 use Osumi\OsumiFramework\App\Model\Installation;
+use Osumi\OsumiFramework\App\Model\Subscription;
 use Osumi\OsumiFramework\App\Utils\Uuid;
 
 class BackupService extends OService {
-  private const RETENTION_LIMIT = 6;
-
   private OtpvV3InspectorService $inspector_service;
   private BackupStorageService $storage_service;
 
@@ -82,6 +81,46 @@ class BackupService extends OService {
     return Backup::where([
       'id_installation' => $installation->id
     ]);
+  }
+
+  /**
+   * Gets the configured backup retention limit for an installation.
+   *
+   * @param Installation $installation Installation whose retention limit is requested.
+   *
+   * @return int Maximum number of backups retained for the installation.
+   *
+   * @throws RuntimeException When the installation has no valid subscription.
+   */
+  public function getRetentionLimit(
+    Installation $installation
+  ): int {
+    if (is_null($installation->id_subscription)) {
+      throw new RuntimeException(
+        'Installation subscription is required to resolve backup retention.'
+      );
+    }
+
+    $subscription = Subscription::findOne([
+      'id' => $installation->id_subscription
+    ]);
+
+    if (is_null($subscription)) {
+      throw new RuntimeException(
+        'Installation subscription could not be found.'
+      );
+    }
+
+    if (
+      is_null($subscription->max_backups_per_installation) ||
+      $subscription->max_backups_per_installation < 1
+    ) {
+      throw new RuntimeException(
+        'Subscription backup retention limit is invalid.'
+      );
+    }
+
+    return $subscription->max_backups_per_installation;
   }
 
   /**
@@ -162,13 +201,17 @@ class BackupService extends OService {
   public function enforceRetention(
     Installation $installation
   ): void {
+    $retention_limit = $this->getRetentionLimit(
+      $installation
+    );
+
     $backups = $this->getByInstallation(
       $installation
     );
 
     if (
       count($backups) <=
-      self::RETENTION_LIMIT
+      $retention_limit
     ) {
       return;
     }
@@ -198,8 +241,7 @@ class BackupService extends OService {
       }
     );
 
-    $delete_count = count($backups)
-      - self::RETENTION_LIMIT;
+    $delete_count = count($backups) - $retention_limit;
 
     for (
       $index = 0;
