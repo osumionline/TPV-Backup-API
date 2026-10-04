@@ -6,6 +6,7 @@ namespace Osumi\OsumiFramework\App\Service;
 
 use JsonException;
 use Throwable;
+use InvalidArgumentException;
 use Osumi\OsumiFramework\Core\OService;
 use Osumi\OsumiFramework\Core\OMiddleware;
 use Osumi\OsumiFramework\App\Model\AuditLog;
@@ -42,6 +43,45 @@ class AuditLogService extends OService {
   private const ACTOR_ADMIN = 'admin';
   private const ACTOR_INSTALLATION = 'installation';
   private const ACTOR_SYSTEM = 'system';
+
+  /**
+   * Gets a page of audit events ordered from newest to oldest.
+   *
+   * @param int $page      One-based page number.
+   * @param int $page_size Number of events per page.
+   *
+   * @return AuditLog[] Audit events for the requested page.
+   *
+   * @throws InvalidArgumentException When pagination values are invalid.
+   */
+  public function getPage(
+    int $page,
+    int $page_size
+  ): array {
+    if (
+      $page < 1 ||
+      $page_size < 1
+    ) {
+      throw new InvalidArgumentException(
+        'Audit pagination values must be greater than zero.'
+      );
+    }
+
+    return AuditLog::all([
+      'order_by' => 'id#DESC',
+      'limit' => $page_size,
+      'offset' => ($page - 1) * $page_size
+    ]);
+  }
+
+  /**
+   * Gets the total number of audit events.
+   *
+   * @return int Total audit event count.
+   */
+  public function countAll(): int {
+    return AuditLog::count();
+  }
 
   /**
    * Records an action performed by the authenticated administrator.

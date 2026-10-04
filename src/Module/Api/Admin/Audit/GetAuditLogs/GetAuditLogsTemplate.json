@@ -1,0 +1,9 @@
+{
+  "status": {{ status | plain }},
+  "message": {{ message | plain }},
+  "page": {{ page | number }},
+  "pageSize": {{ page_size | number }},
+  "total": {{ total | number }},
+  "totalPages": {{ total_pages | number }},
+  "list": [{{ list }}]
+}

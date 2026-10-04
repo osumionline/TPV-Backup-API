@@ -1,0 +1,12 @@
+{
+  "actorType": {{ audit_log.actor_type | plain }},
+  "actorPublicId": {{ actor_public_id | plain }},
+  "actorName": {{ actor_name | plain }},
+  "action": {{ audit_log.action | plain }},
+  "entityType": {{ audit_log.entity_type | plain }},
+  "entityPublicId": {{ audit_log.entity_public_id | plain }},
+  "data": {{ audit_log.data | plain }},
+  "ip": {{ audit_log.ip | plain }},
+  "userAgent": {{ audit_log.user_agent | plain }},
+  "createdAt": {{ audit_log.created_at | date("Y-m-d H:i:s") }}
+}

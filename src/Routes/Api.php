@@ -25,6 +25,7 @@ use Osumi\OsumiFramework\App\Module\Api\Admin\Installations\RotateInstallationCr
 use Osumi\OsumiFramework\App\Module\Api\Admin\Backups\GetBackups\GetBackupsComponent;
 use Osumi\OsumiFramework\App\Module\Api\Admin\Backups\DeleteBackup\DeleteBackupComponent;
 use Osumi\OsumiFramework\App\Module\Api\Admin\Backups\DownloadBackup\DownloadBackupComponent;
+use Osumi\OsumiFramework\App\Module\Api\Admin\Audit\GetAuditLogs\GetAuditLogsComponent;
 
 ORoute::prefix('/api', function(): void {
   ORoute::get('/health', HealthComponent::class);
@@ -82,6 +83,18 @@ ORoute::prefix('/api', function(): void {
         ORoute::get('', GetBackupsComponent::class);
         ORoute::post('/delete', DeleteBackupComponent::class);
         ORoute::get('/download/:publicId', DownloadBackupComponent::class);
+      },
+      [
+        OMiddleware::PHASE_BEFORE => [
+          AdminAuthMiddleware::class
+        ]
+      ]
+    );
+
+    ORoute::prefix(
+      '/audit',
+      function(): void {
+        ORoute::get('', GetAuditLogsComponent::class);
       },
       [
         OMiddleware::PHASE_BEFORE => [
