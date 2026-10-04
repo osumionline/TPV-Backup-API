@@ -6,10 +6,11 @@ namespace Osumi\OsumiFramework\App\Service;
 
 use JsonException;
 use Throwable;
+use Osumi\OsumiFramework\Core\OService;
+use Osumi\OsumiFramework\Core\OMiddleware;
 use Osumi\OsumiFramework\App\Model\AuditLog;
 use Osumi\OsumiFramework\App\Model\Installation;
-use Osumi\OsumiFramework\Core\OMiddleware;
-use Osumi\OsumiFramework\Core\OService;
+use Osumi\OsumiFramework\App\Model\AdminUser;
 
 class AuditLogService extends OService {
   public const ACTION_BACKUP_DOWNLOAD = 'backup.download';
@@ -17,6 +18,26 @@ class AuditLogService extends OService {
   public const ACTION_BACKUP_RETENTION_DELETE = 'backup.retention_delete';
 
   public const ENTITY_BACKUP = 'backup';
+
+  public const ACTION_ADMIN_LOGIN = 'admin.login';
+
+  public const ACTION_SUBSCRIPTION_CREATE = 'subscription.create';
+  public const ACTION_SUBSCRIPTION_UPDATE = 'subscription.update';
+  public const ACTION_SUBSCRIPTION_SET_ACTIVE = 'subscription.set_active';
+  public const ACTION_SUBSCRIPTION_DELETE = 'subscription.delete';
+
+  public const ACTION_INSTALLATION_CREATE = 'installation.create';
+  public const ACTION_INSTALLATION_UPDATE = 'installation.update';
+  public const ACTION_INSTALLATION_SET_ACTIVE = 'installation.set_active';
+  public const ACTION_INSTALLATION_DELETE = 'installation.delete';
+  public const ACTION_INSTALLATION_CREDENTIAL_ROTATE =
+    'installation.credential_rotate';
+  public const ACTION_INSTALLATION_CREDENTIAL_REVOKE =
+    'installation.credential_revoke';
+
+  public const ENTITY_ADMIN_USER = 'admin_user';
+  public const ENTITY_SUBSCRIPTION = 'subscription';
+  public const ENTITY_INSTALLATION = 'installation';
 
   private const ACTOR_ADMIN = 'admin';
   private const ACTOR_INSTALLATION = 'installation';
@@ -54,6 +75,48 @@ class AuditLogService extends OService {
     return $this->record(
       self::ACTOR_ADMIN,
       $admin_id,
+      null,
+      $action,
+      $entity_type,
+      $entity_public_id,
+      $data,
+      $this->getClientIp(),
+      $this->getUserAgent()
+    );
+  }
+
+  /**
+   * Records an action performed by a known administrator.
+   *
+   * This variant is used before AdminAuth middleware context exists, such as
+   * immediately after a successful administrator login.
+   *
+   * @param AdminUser             $admin            Administrator actor.
+   * @param string                $action           Audited action code.
+   * @param string                $entity_type      Affected entity type.
+   * @param string|null           $entity_public_id Public identifier of the affected entity.
+   * @param array<string, mixed>  $data             Additional non-sensitive event data.
+   *
+   * @return bool True when the audit event was persisted.
+   */
+  public function recordAdminUserAction(
+    AdminUser $admin,
+    string $action,
+    string $entity_type,
+    ?string $entity_public_id = null,
+    array $data = []
+  ): bool {
+    if (is_null($admin->id)) {
+      $this->logFailure(
+        'Administrator actor must be persisted before creating an audit event.'
+      );
+
+      return false;
+    }
+
+    return $this->record(
+      self::ACTOR_ADMIN,
+      $admin->id,
       null,
       $action,
       $entity_type,

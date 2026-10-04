@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace Osumi\OsumiFramework\App\Module\Api\Admin\Installations\CreateInstallation;
 
 use Throwable;
+use Osumi\OsumiFramework\Core\OComponent;
 use Osumi\OsumiFramework\App\DTO\CreateInstallationDTO;
 use Osumi\OsumiFramework\App\Model\Installation;
 use Osumi\OsumiFramework\App\Service\InstallationCredentialService;
 use Osumi\OsumiFramework\App\Service\InstallationService;
 use Osumi\OsumiFramework\App\Service\SubscriptionService;
-use Osumi\OsumiFramework\Core\OComponent;
+use Osumi\OsumiFramework\App\Service\AuditLogService;
 
 class CreateInstallationComponent extends OComponent {
   private ?InstallationService $installation_service = null;
   private ?InstallationCredentialService $credential_service = null;
   private ?SubscriptionService $subscription_service = null;
+  private ?AuditLogService $audit_log_service = null;
 
   public string $status = 'error';
   public ?string $public_id = null;
@@ -32,6 +34,7 @@ class CreateInstallationComponent extends OComponent {
     $this->installation_service = inject(InstallationService::class);
     $this->credential_service = inject(InstallationCredentialService::class);
     $this->subscription_service = inject(SubscriptionService::class);
+    $this->audit_log_service = inject(AuditLogService::class);
   }
 
   /**
@@ -104,6 +107,16 @@ class CreateInstallationComponent extends OComponent {
       $core->setHttpStatus(500);
       return;
     }
+
+    $this->audit_log_service?->recordAdminAction(
+      AuditLogService::ACTION_INSTALLATION_CREATE,
+      AuditLogService::ENTITY_INSTALLATION,
+      $installation->public_id,
+      [
+        'subscriptionPublicId' => $subscription->public_id,
+        'keyId' => $credential_data['credential']->key_id
+      ]
+    );
 
     $this->status = 'ok';
     $this->public_id = $installation->public_id;

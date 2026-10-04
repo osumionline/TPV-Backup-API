@@ -6,12 +6,14 @@ namespace Osumi\OsumiFramework\App\Module\Api\Admin\Installations\DeleteInstalla
 
 use DomainException;
 use RuntimeException;
+use Osumi\OsumiFramework\Core\OComponent;
 use Osumi\OsumiFramework\App\DTO\DeleteInstallationDTO;
 use Osumi\OsumiFramework\App\Service\InstallationService;
-use Osumi\OsumiFramework\Core\OComponent;
+use Osumi\OsumiFramework\App\Service\AuditLogService;
 
 class DeleteInstallationComponent extends OComponent {
   private ?InstallationService $installation_service = null;
+  private ?AuditLogService $audit_log_service = null;
 
   public string $status = 'error';
   public ?string $public_id = null;
@@ -24,6 +26,7 @@ class DeleteInstallationComponent extends OComponent {
     parent::__construct();
 
     $this->installation_service = inject(InstallationService::class);
+    $this->audit_log_service = inject(AuditLogService::class);
   }
 
   /**
@@ -70,6 +73,12 @@ class DeleteInstallationComponent extends OComponent {
       $core->setHttpStatus(500);
       return;
     }
+
+    $this->audit_log_service?->recordAdminAction(
+      AuditLogService::ACTION_INSTALLATION_DELETE,
+      AuditLogService::ENTITY_INSTALLATION,
+      $public_id
+    );
 
     $this->status = 'ok';
     $this->public_id = $public_id;

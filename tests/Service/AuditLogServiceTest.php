@@ -8,6 +8,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Osumi\OsumiFramework\App\Model\AuditLog;
 use Osumi\OsumiFramework\App\Model\Installation;
+use Osumi\OsumiFramework\App\Model\AdminUser;
 use Osumi\OsumiFramework\App\Service\AuditLogService;
 
 final class AuditLogServiceTest extends TestCase {
@@ -147,6 +148,99 @@ final class AuditLogServiceTest extends TestCase {
         AuditLogService::ACTION_BACKUP_DELETE,
         AuditLogService::ENTITY_BACKUP,
         'backup-public-id'
+      )
+    );
+  }
+
+  /**
+   * Verifies that a known administrator can be audited without middleware context.
+   *
+   * @return void
+   */
+  public function testRecordAdminUserActionPersistsAuditEvent(): void {
+    $admin = new AdminUser();
+
+    $admin->id = 25;
+    $admin->public_id =
+      '4c3ad766-52f8-45cd-b682-21ae15ebaf87';
+
+    $service = $this->createServiceMock();
+
+    $service
+      ->expects(
+        self::once()
+      )
+      ->method('getClientIp')
+      ->willReturn(
+        '203.0.113.20'
+      );
+
+    $service
+      ->expects(
+        self::once()
+      )
+      ->method('getUserAgent')
+      ->willReturn(
+        'TPV Backup Login Test'
+      );
+
+    $service
+      ->expects(
+        self::once()
+      )
+      ->method('persist')
+      ->with(
+        self::callback(
+          static function(
+            AuditLog $audit_log
+          ): bool {
+            self::assertSame(
+              'admin',
+              $audit_log->actor_type
+            );
+
+            self::assertSame(
+              25,
+              $audit_log->id_admin_user
+            );
+
+            self::assertSame(
+              AuditLogService::ACTION_ADMIN_LOGIN,
+              $audit_log->action
+            );
+
+            self::assertSame(
+              AuditLogService::ENTITY_ADMIN_USER,
+              $audit_log->entity_type
+            );
+
+            self::assertSame(
+              '4c3ad766-52f8-45cd-b682-21ae15ebaf87',
+              $audit_log->entity_public_id
+            );
+
+            self::assertSame(
+              '203.0.113.20',
+              $audit_log->ip
+            );
+
+            self::assertSame(
+              'TPV Backup Login Test',
+              $audit_log->user_agent
+            );
+
+            return true;
+          }
+        )
+      )
+      ->willReturn(true);
+
+    self::assertTrue(
+      $service->recordAdminUserAction(
+        $admin,
+        AuditLogService::ACTION_ADMIN_LOGIN,
+        AuditLogService::ENTITY_ADMIN_USER,
+        $admin->public_id
       )
     );
   }

@@ -7,9 +7,11 @@ namespace Osumi\OsumiFramework\App\Module\Api\Admin\Subscriptions\SetSubscriptio
 use Osumi\OsumiFramework\App\DTO\SetSubscriptionActiveDTO;
 use Osumi\OsumiFramework\App\Service\SubscriptionService;
 use Osumi\OsumiFramework\Core\OComponent;
+use Osumi\OsumiFramework\App\Service\AuditLogService;
 
 class SetSubscriptionActiveComponent extends OComponent {
   private ?SubscriptionService $subscription_service = null;
+  private ?AuditLogService $audit_log_service = null;
 
   public string $status = 'error';
   public ?string $public_id = null;
@@ -23,6 +25,7 @@ class SetSubscriptionActiveComponent extends OComponent {
     parent::__construct();
 
     $this->subscription_service = inject(SubscriptionService::class);
+    $this->audit_log_service = inject(AuditLogService::class);
   }
 
   /**
@@ -58,6 +61,15 @@ class SetSubscriptionActiveComponent extends OComponent {
     $subscription = $this->subscription_service->setActive(
       $subscription,
       $dto->active
+    );
+
+    $this->audit_log_service?->recordAdminAction(
+      AuditLogService::ACTION_SUBSCRIPTION_SET_ACTIVE,
+      AuditLogService::ENTITY_SUBSCRIPTION,
+      $subscription->public_id,
+      [
+        'active' => $subscription->active
+      ]
     );
 
     $this->status = 'ok';

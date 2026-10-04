@@ -9,9 +9,11 @@ use Osumi\OsumiFramework\Core\OComponent;
 use Osumi\OsumiFramework\App\DTO\UpdateSubscriptionDTO;
 use Osumi\OsumiFramework\App\Model\Installation;
 use Osumi\OsumiFramework\App\Service\SubscriptionService;
+use Osumi\OsumiFramework\App\Service\AuditLogService;
 
 class UpdateSubscriptionComponent extends OComponent {
   private ?SubscriptionService $subscription_service = null;
+  private ?AuditLogService $audit_log_service = null;
 
   public string $status = 'error';
   public ?string $public_id = null;
@@ -24,6 +26,7 @@ class UpdateSubscriptionComponent extends OComponent {
     parent::__construct();
 
     $this->subscription_service = inject(SubscriptionService::class);
+    $this->audit_log_service = inject(AuditLogService::class);
   }
 
   /**
@@ -130,6 +133,18 @@ class UpdateSubscriptionComponent extends OComponent {
       $expires_at,
       $dto->maxInstallations,
       $dto->maxBackupsPerInstallation
+    );
+
+    $this->audit_log_service?->recordAdminAction(
+      AuditLogService::ACTION_SUBSCRIPTION_UPDATE,
+      AuditLogService::ENTITY_SUBSCRIPTION,
+      $subscription->public_id,
+      [
+        'expiresAt' => $subscription->expires_at,
+        'maxInstallations' => $subscription->max_installations,
+        'maxBackupsPerInstallation' =>
+          $subscription->max_backups_per_installation
+      ]
     );
 
     $this->status = 'ok';

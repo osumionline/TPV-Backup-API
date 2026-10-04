@@ -8,9 +8,11 @@ use DateTimeImmutable;
 use Osumi\OsumiFramework\Core\OComponent;
 use Osumi\OsumiFramework\App\DTO\CreateSubscriptionDTO;
 use Osumi\OsumiFramework\App\Service\SubscriptionService;
+use Osumi\OsumiFramework\App\Service\AuditLogService;
 
 class CreateSubscriptionComponent extends OComponent {
   private ?SubscriptionService $subscription_service = null;
+  private ?AuditLogService $audit_log_service = null;
 
   public string $status = 'error';
   public ?string $public_id = null;
@@ -23,6 +25,7 @@ class CreateSubscriptionComponent extends OComponent {
     parent::__construct();
 
     $this->subscription_service = inject(SubscriptionService::class);
+    $this->audit_log_service = inject(AuditLogService::class);
   }
 
   /**
@@ -105,6 +108,18 @@ class CreateSubscriptionComponent extends OComponent {
       $expires_at,
       $max_installations,
       $max_backups_per_installation
+    );
+
+    $this->audit_log_service?->recordAdminAction(
+      AuditLogService::ACTION_SUBSCRIPTION_CREATE,
+      AuditLogService::ENTITY_SUBSCRIPTION,
+      $subscription->public_id,
+      [
+        'expiresAt' => $subscription->expires_at,
+        'maxInstallations' => $subscription->max_installations,
+        'maxBackupsPerInstallation' =>
+          $subscription->max_backups_per_installation
+      ]
     );
 
     $this->status = 'ok';

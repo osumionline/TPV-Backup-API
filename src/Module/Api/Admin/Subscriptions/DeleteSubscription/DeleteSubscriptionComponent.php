@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Osumi\OsumiFramework\App\Module\Api\Admin\Subscriptions\DeleteSubscription;
 
+use Osumi\OsumiFramework\Core\OComponent;
 use Osumi\OsumiFramework\App\DTO\DeleteSubscriptionDTO;
 use Osumi\OsumiFramework\App\Model\Installation;
 use Osumi\OsumiFramework\App\Service\SubscriptionService;
-use Osumi\OsumiFramework\Core\OComponent;
+use Osumi\OsumiFramework\App\Service\AuditLogService;
 
 class DeleteSubscriptionComponent extends OComponent {
   private ?SubscriptionService $subscription_service = null;
+  private ?AuditLogService $audit_log_service = null;
 
   public string $status = 'error';
   public ?string $public_id = null;
@@ -23,6 +25,7 @@ class DeleteSubscriptionComponent extends OComponent {
     parent::__construct();
 
     $this->subscription_service = inject(SubscriptionService::class);
+    $this->audit_log_service = inject(AuditLogService::class);
   }
 
   /**
@@ -71,6 +74,12 @@ class DeleteSubscriptionComponent extends OComponent {
       $core->setHttpStatus(500);
       return;
     }
+
+    $this->audit_log_service?->recordAdminAction(
+      AuditLogService::ACTION_SUBSCRIPTION_DELETE,
+      AuditLogService::ENTITY_SUBSCRIPTION,
+      $public_id
+    );
 
     $this->status = 'ok';
     $this->public_id = $public_id;

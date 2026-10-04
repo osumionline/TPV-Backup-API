@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Osumi\OsumiFramework\App\Module\Api\Admin\Installations\SetInstallationActive;
 
 use RuntimeException;
+use Osumi\OsumiFramework\Core\OComponent;
 use Osumi\OsumiFramework\App\DTO\SetInstallationActiveDTO;
 use Osumi\OsumiFramework\App\Service\InstallationService;
-use Osumi\OsumiFramework\Core\OComponent;
+use Osumi\OsumiFramework\App\Service\AuditLogService;
 
 class SetInstallationActiveComponent extends OComponent {
   private ?InstallationService $installation_service = null;
+  private ?AuditLogService $audit_log_service = null;
 
   public string $status = 'error';
   public ?string $public_id = null;
@@ -24,6 +26,7 @@ class SetInstallationActiveComponent extends OComponent {
     parent::__construct();
 
     $this->installation_service = inject(InstallationService::class);
+    $this->audit_log_service = inject(AuditLogService::class);
   }
 
   /**
@@ -67,6 +70,15 @@ class SetInstallationActiveComponent extends OComponent {
       $core->setHttpStatus(500);
       return;
     }
+
+    $this->audit_log_service?->recordAdminAction(
+      AuditLogService::ACTION_INSTALLATION_SET_ACTIVE,
+      AuditLogService::ENTITY_INSTALLATION,
+      $installation->public_id,
+      [
+        'active' => $installation->active
+      ]
+    );
 
     $this->status = 'ok';
     $this->public_id = $installation->public_id;
