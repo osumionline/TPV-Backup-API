@@ -20,6 +20,7 @@ use Osumi\OsumiFramework\App\Utils\Uuid;
 class BackupService extends OService {
   private OtpvV3InspectorService $inspector_service;
   private BackupStorageService $storage_service;
+  private ?AuditLogService $audit_log_service = null;
 
   /**
    * Initializes backup service dependencies.
@@ -31,6 +32,10 @@ class BackupService extends OService {
 
     $this->storage_service = inject(
       BackupStorageService::class
+    );
+
+    $this->audit_log_service = inject(
+      AuditLogService::class
     );
   }
 
@@ -248,8 +253,25 @@ class BackupService extends OService {
       $index < $delete_count;
       $index++
     ) {
+      $backup = $backups[$index];
+
+      $public_id = $backup->public_id;
+      $backup_id = $backup->backup_id;
+      $created_at_client = $backup->created_at_client;
+
       $this->delete(
-        $backups[$index]
+        $backup
+      );
+
+      $this->audit_log_service?->recordSystemAction(
+        AuditLogService::ACTION_BACKUP_RETENTION_DELETE,
+        AuditLogService::ENTITY_BACKUP,
+        $public_id,
+        [
+          'installationPublicId' => $installation->public_id,
+          'backupId' => $backup_id,
+          'createdAtClient' => $created_at_client
+        ]
       );
     }
   }

@@ -10,9 +10,11 @@ use Osumi\OsumiFramework\App\Model\Backup;
 use Osumi\OsumiFramework\App\Service\BackupService;
 use Osumi\OsumiFramework\Core\OComponent;
 use Osumi\OsumiFramework\Web\OStreamResponse;
+use Osumi\OsumiFramework\App\Service\AuditLogService;
 
 class DownloadBackupComponent extends OComponent {
   private ?BackupService $backup_service = null;
+  private ?AuditLogService $audit_log_service = null;
 
   public string $status = 'error';
   public string $message = '';
@@ -25,6 +27,9 @@ class DownloadBackupComponent extends OComponent {
 
     $this->backup_service = inject(
       BackupService::class
+    );
+    $this->audit_log_service = inject(
+      AuditLogService::class
     );
   }
 
@@ -77,6 +82,17 @@ class DownloadBackupComponent extends OComponent {
 
       return null;
     }
+
+    $this->audit_log_service?->recordAdminAction(
+      AuditLogService::ACTION_BACKUP_DOWNLOAD,
+      AuditLogService::ENTITY_BACKUP,
+      $backup->public_id,
+      [
+        'backupId' => $backup->backup_id,
+        'originalFilename' => $backup->original_filename,
+        'sizeBytes' => $backup->size_bytes
+      ]
+    );
 
     return new OStreamResponse(
       $stream,
