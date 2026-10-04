@@ -171,12 +171,14 @@ class CreateBackupComponent extends OComponent {
     }
 
     try {
-      $backup =
+      $result =
         $this->backup_service->createFromFile(
           $installation,
           $temporary_path,
           $original_filename
         );
+
+      $backup = $result->backup;
     }
     catch (InvalidOtpvPackageException) {
       $this->message =
@@ -200,19 +202,21 @@ class CreateBackupComponent extends OComponent {
       return;
     }
 
-    $this->audit_log_service
-      ?->recordInstallationAction(
-        $installation,
-        AuditLogService::ACTION_BACKUP_CREATE,
-        AuditLogService::ENTITY_BACKUP,
-        $backup->public_id,
-        [
-          'backupId' => $backup->backup_id,
-          'originalFilename' =>
-            $backup->original_filename,
-          'sizeBytes' => $backup->size_bytes
-        ]
-      );
+    if ($result->created) {
+      $this->audit_log_service
+        ?->recordInstallationAction(
+          $installation,
+          AuditLogService::ACTION_BACKUP_CREATE,
+          AuditLogService::ENTITY_BACKUP,
+          $backup->public_id,
+          [
+            'backupId' => $backup->backup_id,
+            'originalFilename' =>
+              $backup->original_filename,
+            'sizeBytes' => $backup->size_bytes
+          ]
+        );
+    }
 
     $this->status = 'ok';
     $this->public_id = $backup->public_id;

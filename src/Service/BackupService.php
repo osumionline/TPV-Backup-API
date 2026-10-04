@@ -16,6 +16,7 @@ use Osumi\OsumiFramework\App\Model\Backup;
 use Osumi\OsumiFramework\App\Model\Installation;
 use Osumi\OsumiFramework\App\Model\Subscription;
 use Osumi\OsumiFramework\App\Utils\Uuid;
+use Osumi\OsumiFramework\App\Result\BackupCreateResult;
 
 class BackupService extends OService {
   private OtpvV3InspectorService $inspector_service;
@@ -361,18 +362,18 @@ class BackupService extends OService {
    * @param string       $file_path        Local temporary OTPV path.
    * @param string       $original_filename Original uploaded file name.
    *
-   * @return Backup Persisted or previously existing backup.
+   * @return BackupCreateResult Backup result including whether it was newly created.
    *
    * @throws InvalidOtpvPackageException When the package or original filename is invalid.
    * @throws BackupConflictException When the backup identifier is already used
    *                                 by different content or another installation.
    * @throws RuntimeException When storage or persistence fails.
    */
-  public function createFromFile(
-    Installation $installation,
-    string $file_path,
-    string $original_filename
-  ): Backup {
+   public function createFromFile(
+     Installation $installation,
+     string $file_path,
+     string $original_filename
+   ): BackupCreateResult {
     if (
       is_null($installation->id) ||
       is_null($installation->public_id)
@@ -405,7 +406,10 @@ class BackupService extends OService {
         $installation
       );
 
-      return $resolved_backup;
+      return new BackupCreateResult(
+        $resolved_backup,
+        false
+      );
     }
 
     $public_id = Uuid::v4();
@@ -493,7 +497,10 @@ class BackupService extends OService {
           $installation
         );
 
-        return $resolved_backup;
+        return new BackupCreateResult(
+          $resolved_backup,
+          false
+        );
       }
 
       if ($exception instanceof BackupConflictException) {
@@ -511,7 +518,10 @@ class BackupService extends OService {
       $installation
     );
 
-    return $backup;
+    return new BackupCreateResult(
+      $backup,
+      true
+    );
   }
 
   /**

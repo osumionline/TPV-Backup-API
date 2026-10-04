@@ -19,6 +19,7 @@ use Osumi\OsumiFramework\App\Service\BackupService;
 use Osumi\OsumiFramework\App\Service\InstallationService;
 use Osumi\OsumiFramework\Core\OCore;
 use Osumi\OsumiFramework\Core\OMiddleware;
+use Osumi\OsumiFramework\App\Result\BackupCreateResult;
 
 final class CreateBackupComponentTest extends TestCase {
   private bool $core_existed = false;
@@ -443,7 +444,10 @@ final class CreateBackupComponentTest extends TestCase {
         'backup.otpv'
       )
       ->willReturn(
-        $backup
+        new BackupCreateResult(
+          $backup,
+          true
+        )
       );
 
     $audit_service
