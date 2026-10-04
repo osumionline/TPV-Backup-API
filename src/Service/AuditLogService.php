@@ -17,6 +17,7 @@ class AuditLogService extends OService {
   public const ACTION_BACKUP_DOWNLOAD = 'backup.download';
   public const ACTION_BACKUP_DELETE = 'backup.delete';
   public const ACTION_BACKUP_RETENTION_DELETE = 'backup.retention_delete';
+  public const ACTION_BACKUP_CREATE = 'backup.create';
 
   public const ENTITY_BACKUP = 'backup';
 

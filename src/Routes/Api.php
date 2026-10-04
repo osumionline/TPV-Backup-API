@@ -124,6 +124,21 @@ ORoute::prefix('/api', function(): void {
           ]
         ]
       );
+
+      ORoute::prefix(
+        '/backups',
+        function(): void {
+          ORoute::post(
+            '',
+            CreateBackupComponent::class
+          );
+        },
+        [
+          OMiddleware::PHASE_BEFORE => [
+            InstallationAuthMiddleware::class
+          ]
+        ]
+      );
     }
   );
 });

@@ -41,6 +41,24 @@ class InstallationService extends OService {
   }
 
   /**
+   * Gets an installation by its internal identifier.
+   *
+   * This method is intended for trusted server-side identifiers such as those
+   * published by authentication middleware.
+   *
+   * @param int $id Installation internal identifier.
+   *
+   * @return Installation|null Installation or null when it does not exist.
+   */
+  public function getById(
+    int $id
+  ): ?Installation {
+    return Installation::findOne([
+      'id' => $id
+    ]);
+  }
+
+  /**
    * Counts the installations registered for a subscription.
    *
    * @param Subscription $subscription Subscription to inspect.

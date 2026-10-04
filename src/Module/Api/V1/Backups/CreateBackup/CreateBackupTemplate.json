@@ -1,0 +1,12 @@
+{
+  "status": {{ status | plain }},
+  "message": {{ message | plain }},
+  "backup": {
+    "publicId": {{ public_id | plain }},
+    "backupId": {{ backup_id | plain }},
+    "createdAtClient": {{ created_at_client | plain }},
+    "originalFilename": {{ original_filename | plain }},
+    "sizeBytes": {{ size_bytes | number }},
+    "sha256": {{ sha256 | plain }}
+  }
+}
