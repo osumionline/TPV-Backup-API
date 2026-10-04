@@ -143,25 +143,31 @@ class InstallationAuthService extends OService {
       return null;
     }
 
-    $credential_id = $claims['credential_id']
-      ?? null;
+    $credential_id = filter_var(
+      $claims['credential_id']
+        ?? null,
+      FILTER_VALIDATE_INT
+    );
 
     $key_id = $claims['key_id']
       ?? null;
 
-    $installation_id = $claims['installation_id']
-      ?? null;
+    $installation_id = filter_var(
+      $claims['installation_id']
+        ?? null,
+      FILTER_VALIDATE_INT
+    );
 
     $installation_public_id =
       $claims['installation_public_id']
       ?? null;
 
     if (
-      !is_int($credential_id) ||
+      $credential_id === false ||
       $credential_id <= 0 ||
       !is_string($key_id) ||
       $key_id === '' ||
-      !is_int($installation_id) ||
+      $installation_id === false ||
       $installation_id <= 0 ||
       !is_string($installation_public_id) ||
       $installation_public_id === ''

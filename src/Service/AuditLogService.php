@@ -31,12 +31,9 @@ class AuditLogService extends OService {
   public const ACTION_INSTALLATION_UPDATE = 'installation.update';
   public const ACTION_INSTALLATION_SET_ACTIVE = 'installation.set_active';
   public const ACTION_INSTALLATION_DELETE = 'installation.delete';
-  public const ACTION_INSTALLATION_CREDENTIAL_ROTATE =
-    'installation.credential_rotate';
-  public const ACTION_INSTALLATION_CREDENTIAL_REVOKE =
-    'installation.credential_revoke';
-  public const ACTION_INSTALLATION_AUTHENTICATE =
-  'installation.authenticate';
+  public const ACTION_INSTALLATION_CREDENTIAL_ROTATE = 'installation.credential_rotate';
+  public const ACTION_INSTALLATION_CREDENTIAL_REVOKE = 'installation.credential_revoke';
+  public const ACTION_INSTALLATION_AUTHENTICATE = 'installation.authenticate';
 
   public const ENTITY_ADMIN_USER = 'admin_user';
   public const ENTITY_SUBSCRIPTION = 'subscription';
