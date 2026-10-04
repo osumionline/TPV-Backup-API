@@ -17,6 +17,8 @@ use Osumi\OsumiFramework\App\Model\Installation;
 use Osumi\OsumiFramework\App\Utils\Uuid;
 
 class BackupService extends OService {
+  private const RETENTION_LIMIT = 6;
+
   private OtpvV3InspectorService $inspector_service;
   private BackupStorageService $storage_service;
 
@@ -56,6 +58,29 @@ class BackupService extends OService {
   public function getAll(): array {
     return Backup::all([
       'order_by' => 'created_at_client#DESC'
+    ]);
+  }
+
+  /**
+   * Gets all backups registered for an installation.
+   *
+   * @param Installation $installation Installation whose backups are requested.
+   *
+   * @return Backup[] Backups registered for the installation.
+   *
+   * @throws RuntimeException When the installation is not persisted.
+   */
+  public function getByInstallation(
+    Installation $installation
+  ): array {
+    if (is_null($installation->id)) {
+      throw new RuntimeException(
+        'Installation must be persisted before loading its backups.'
+      );
+    }
+
+    return Backup::where([
+      'id_installation' => $installation->id
     ]);
   }
 
@@ -120,6 +145,71 @@ class BackupService extends OService {
     return $this->storage_service->openReadStream(
       $backup->storage_key
     );
+  }
+
+  /**
+   * Enforces the maximum number of stored backups for an installation.
+   *
+   * Backups are considered oldest by the creation date declared by the client.
+   * The internal database identifier is used as a deterministic tie breaker.
+   *
+   * @param Installation $installation Installation whose backups must be limited.
+   *
+   * @return void
+   *
+   * @throws RuntimeException When a backup cannot be deleted.
+   */
+  public function enforceRetention(
+    Installation $installation
+  ): void {
+    $backups = $this->getByInstallation(
+      $installation
+    );
+
+    if (
+      count($backups) <=
+      self::RETENTION_LIMIT
+    ) {
+      return;
+    }
+
+    usort(
+      $backups,
+      static function(
+        Backup $first,
+        Backup $second
+      ): int {
+        $date_comparison = strcmp(
+          $first->created_at_client ?? '',
+          $second->created_at_client ?? ''
+        );
+
+        if ($date_comparison !== 0) {
+          return $date_comparison;
+        }
+
+        return (
+          $first->id ??
+          PHP_INT_MAX
+        ) <=> (
+          $second->id ??
+          PHP_INT_MAX
+        );
+      }
+    );
+
+    $delete_count = count($backups)
+      - self::RETENTION_LIMIT;
+
+    for (
+      $index = 0;
+      $index < $delete_count;
+      $index++
+    ) {
+      $this->delete(
+        $backups[$index]
+      );
+    }
   }
 
   /**
@@ -241,11 +331,17 @@ class BackupService extends OService {
     );
 
     if (!is_null($existing_backup)) {
-      return $this->resolveExistingBackup(
+      $resolved_backup = $this->resolveExistingBackup(
         $existing_backup,
         $installation,
         $inspection
       );
+
+      $this->enforceRetentionSafely(
+        $installation
+      );
+
+      return $resolved_backup;
     }
 
     $public_id = Uuid::v4();
@@ -296,8 +392,6 @@ class BackupService extends OService {
           'Backup metadata could not be persisted.'
         );
       }
-
-      return $backup;
     }
     catch (Throwable $exception) {
       if ($stored) {
@@ -325,11 +419,17 @@ class BackupService extends OService {
       );
 
       if (!is_null($existing_backup)) {
-        return $this->resolveExistingBackup(
+        $resolved_backup = $this->resolveExistingBackup(
           $existing_backup,
           $installation,
           $inspection
         );
+
+        $this->enforceRetentionSafely(
+          $installation
+        );
+
+        return $resolved_backup;
       }
 
       if ($exception instanceof BackupConflictException) {
@@ -340,6 +440,47 @@ class BackupService extends OService {
         'Backup could not be persisted.',
         0,
         $exception
+      );
+    }
+
+    $this->enforceRetentionSafely(
+      $installation
+    );
+
+    return $backup;
+  }
+
+  /**
+   * Applies backup retention without invalidating an already persisted backup.
+   *
+   * Retention cleanup is best-effort. A failure is logged so the successful
+   * backup remains available and a later upload or retry can attempt cleanup
+   * again.
+   *
+   * @param Installation $installation Installation whose retention must be enforced.
+   *
+   * @return void
+   */
+  private function enforceRetentionSafely(
+    Installation $installation
+  ): void {
+    try {
+      $this->enforceRetention(
+        $installation
+      );
+    }
+    catch (Throwable $exception) {
+      $installation_identifier =
+        $installation->public_id
+        ?? strval(
+          $installation->id
+          ?? 'unknown'
+        );
+
+      $this->log?->error(
+        'Backup retention cleanup failed for installation '
+        . "'{$installation_identifier}': "
+        . $exception->getMessage()
       );
     }
   }
