@@ -322,7 +322,8 @@ final class DownloadBackupComponentTest extends TestCase {
         ),
         'Content-Disposition' =>
           'attachment; filename="backup.otpv"; filename*=UTF-8\'\''
-          . 'Copia%20TPV%20%C3%B1%202026.otpv'
+          . 'Copia%20TPV%20%C3%B1%202026.otpv',
+        'Access-Control-Expose-Headers' => 'Content-Disposition'
       ],
       $result->getHeaders()
     );

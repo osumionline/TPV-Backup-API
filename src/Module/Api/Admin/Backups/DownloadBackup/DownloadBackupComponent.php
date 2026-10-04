@@ -87,7 +87,8 @@ class DownloadBackupComponent extends OComponent {
         ),
         'Content-Disposition' => $this->buildContentDisposition(
           $backup
-        )
+        ),
+        'Access-Control-Expose-Headers' => 'Content-Disposition'
       ]
     );
   }
