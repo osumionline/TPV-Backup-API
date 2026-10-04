@@ -6,6 +6,7 @@
   "allow-cross-origin": true,
   "extra": {
     "admin_token_ttl": 28800,
+    "installation_token_ttl": 3600,
     "backup_storage_path": "storage/backups"
   }
 }

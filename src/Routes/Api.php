@@ -26,6 +26,7 @@ use Osumi\OsumiFramework\App\Module\Api\Admin\Backups\GetBackups\GetBackupsCompo
 use Osumi\OsumiFramework\App\Module\Api\Admin\Backups\DeleteBackup\DeleteBackupComponent;
 use Osumi\OsumiFramework\App\Module\Api\Admin\Backups\DownloadBackup\DownloadBackupComponent;
 use Osumi\OsumiFramework\App\Module\Api\Admin\Audit\GetAuditLogs\GetAuditLogsComponent;
+use Osumi\OsumiFramework\App\Module\Api\V1\Auth\CreateInstallationToken\CreateInstallationTokenComponent;
 
 ORoute::prefix('/api', function(): void {
   ORoute::get('/health', HealthComponent::class);
@@ -103,4 +104,14 @@ ORoute::prefix('/api', function(): void {
       ]
     );
   });
+
+  ORoute::prefix(
+    '/v1',
+    function(): void {
+      ORoute::post(
+        '/auth/token',
+        CreateInstallationTokenComponent::class
+      );
+    }
+  );
 });

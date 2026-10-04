@@ -1,0 +1,16 @@
+{
+  "status": {{ status | plain }},
+  "message": {{ message | plain }},
+  "token": {{ token | plain }},
+  "expiresAt": {{ expires_at | number }},
+  "installation": {
+    "publicId": {{ installation_public_id | plain }},
+    "name": {{ installation_name | plain }}
+  },
+  "subscription": {
+    "publicId": {{ subscription_public_id | plain }},
+    "name": {{ subscription_name | plain }},
+    "status": {{ subscription_status | plain }}
+  },
+  "canUpload": {{ can_upload | bool }}
+}
