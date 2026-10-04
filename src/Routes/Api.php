@@ -29,6 +29,7 @@ use Osumi\OsumiFramework\App\Module\Api\Admin\Audit\GetAuditLogs\GetAuditLogsCom
 use Osumi\OsumiFramework\App\Module\Api\V1\Auth\CreateInstallationToken\CreateInstallationTokenComponent;
 use Osumi\OsumiFramework\App\Middleware\InstallationAuthMiddleware;
 use Osumi\OsumiFramework\App\Module\Api\V1\Me\MeComponent as InstallationMeComponent;
+use Osumi\OsumiFramework\App\Module\Api\V1\Backups\CreateBackup\CreateBackupComponent;
 
 ORoute::prefix('/api', function(): void {
   ORoute::get('/health', HealthComponent::class);
