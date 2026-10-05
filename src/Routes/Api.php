@@ -32,6 +32,7 @@ use Osumi\OsumiFramework\App\Module\Api\V1\Me\MeComponent as InstallationMeCompo
 use Osumi\OsumiFramework\App\Module\Api\V1\Backups\CreateBackup\CreateBackupComponent;
 use Osumi\OsumiFramework\App\Module\Api\V1\Backups\GetBackups\GetBackupsComponent as InstallationGetBackupsComponent;
 use Osumi\OsumiFramework\App\Module\Api\V1\Backups\DownloadBackup\DownloadBackupComponent as InstallationDownloadBackupComponent;
+use Osumi\OsumiFramework\App\Module\Api\V1\Backups\DeleteBackup\DeleteBackupComponent as InstallationDeleteBackupComponent;
 
 ORoute::prefix('/api', function(): void {
   ORoute::get('/health', HealthComponent::class);
@@ -139,6 +140,11 @@ ORoute::prefix('/api', function(): void {
           ORoute::get(
             '/:publicId/download',
             InstallationDownloadBackupComponent::class
+          );
+
+          ORoute::delete(
+            '/:publicId',
+            InstallationDeleteBackupComponent::class
           );
 
           ORoute::post(
