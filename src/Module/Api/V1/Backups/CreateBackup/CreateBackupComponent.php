@@ -61,6 +61,12 @@ class CreateBackupComponent extends OComponent {
   ): void {
     global $core;
 
+    if ($this->isPostMaxSizeExceeded()) {
+      $this->message = 'Backup file is too large.';
+      $core->setHttpStatus(413);
+      return;
+    }
+
     if (
       !$dto->isValid() ||
       is_null($dto->file) ||
@@ -227,6 +233,67 @@ class CreateBackupComponent extends OComponent {
       $backup->original_filename;
     $this->size_bytes = $backup->size_bytes;
     $this->sha256 = $backup->sha256;
+  }
+
+  /**
+   * Checks whether PHP discarded the request body because post_max_size was exceeded.
+   *
+   * When this happens PHP leaves $_POST and $_FILES empty, so the condition must
+   * be detected from CONTENT_LENGTH before validating the upload DTO.
+   *
+   * @return bool True when the request body exceeds PHP post_max_size.
+   */
+  protected function isPostMaxSizeExceeded(): bool {
+    $content_length =
+      $_SERVER['CONTENT_LENGTH']
+      ?? null;
+
+    if (is_string($content_length)) {
+      if (
+        preg_match(
+          '/^\d+$/D',
+          $content_length
+        ) !== 1
+      ) {
+        return false;
+      }
+
+      $content_length = (int) $content_length;
+    }
+
+    if (
+      !is_int($content_length) ||
+      $content_length <= 0
+    ) {
+      return false;
+    }
+
+    $post_max_size =
+      ini_get(
+        'post_max_size'
+      );
+
+    if (
+      $post_max_size === false ||
+      trim($post_max_size) === ''
+    ) {
+      return false;
+    }
+
+    $post_max_bytes =
+      ini_parse_quantity(
+        $post_max_size
+      );
+
+    /*
+     * A value of zero means that PHP does not impose a POST size limit.
+     */
+    if ($post_max_bytes <= 0) {
+      return false;
+    }
+
+    return $content_length >
+      $post_max_bytes;
   }
 
   /**

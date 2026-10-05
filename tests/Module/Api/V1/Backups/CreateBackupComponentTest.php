@@ -70,6 +70,79 @@ final class CreateBackupComponentTest extends TestCase {
   }
 
   /**
+   * Verifies that requests rejected by PHP post_max_size return HTTP 413.
+   *
+   * @return void
+   */
+  public function testRunRejectsRequestExceedingPostMaxSize(): void {
+    $installation_service =
+      $this->createInstallationServiceMock();
+
+    $backup_service =
+      $this->createBackupServiceMock();
+
+    $audit_service =
+      $this->createAuditServiceMock();
+
+    $installation_service
+      ->expects(
+        self::never()
+      )
+      ->method('getById');
+
+    $backup_service
+      ->expects(
+        self::never()
+      )
+      ->method('createFromFile');
+
+    $audit_service
+      ->expects(
+        self::never()
+      )
+      ->method('recordInstallationAction');
+
+    $component = $this->createComponent(
+      $installation_service,
+      $backup_service,
+      $audit_service
+    );
+
+    $component
+      ->expects(
+        self::once()
+      )
+      ->method('isPostMaxSizeExceeded')
+      ->willReturn(true);
+
+    $component
+      ->expects(
+        self::never()
+      )
+      ->method('isUploadedFile');
+
+    $component
+      ->expects(
+        self::never()
+      )
+      ->method('getFileSize');
+
+    $component->run(
+      $this->createDto()
+    );
+
+    self::assertSame(
+      413,
+      OMiddleware::getStatusCode()
+    );
+
+    self::assertSame(
+      'Backup file is too large.',
+      $component->message
+    );
+  }
+
+  /**
    * Verifies that an expired subscription cannot upload.
    *
    * @return void
@@ -551,6 +624,7 @@ final class CreateBackupComponentTest extends TestCase {
       )
       ->disableOriginalConstructor()
       ->onlyMethods([
+        'isPostMaxSizeExceeded',
         'isUploadedFile',
         'getFileSize'
       ])
