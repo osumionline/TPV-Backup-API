@@ -84,9 +84,14 @@ class BackupService extends OService {
       );
     }
 
-    return Backup::where([
-      'id_installation' => $installation->id
-    ]);
+    return Backup::where(
+      [
+        'id_installation' => $installation->id
+      ],
+      [
+        'order_by' => 'created_at_client#DESC'
+      ]
+    );
   }
 
   /**

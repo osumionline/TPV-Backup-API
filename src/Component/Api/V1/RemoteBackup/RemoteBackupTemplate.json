@@ -1,0 +1,12 @@
+{
+  "publicId": {{ backup.public_id | plain }},
+  "backupId": {{ backup.backup_id | plain }},
+  "createdAtClient": {{ backup.created_at_client | date("Y-m-d H:i:s") }},
+  "formatVersion": {{ backup.format_version | number }},
+  "applicationVersion": {{ backup.application_version | plain }},
+  "databaseSchemaVersion": {{ backup.database_schema_version | number }},
+  "originalFilename": {{ backup.original_filename | plain }},
+  "sizeBytes": {{ backup.size_bytes | number }},
+  "sha256": {{ backup.sha256 | plain }},
+  "createdAt": {{ backup.created_at | date("Y-m-d H:i:s") }}
+}

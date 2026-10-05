@@ -1,0 +1,5 @@
+{
+  "status": {{ status | plain }},
+  "message": {{ message | plain }},
+  "list": [{{ list }}]
+}
