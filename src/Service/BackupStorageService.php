@@ -98,6 +98,21 @@ class BackupStorageService extends OService {
   }
 
   /**
+   * Calculates the SHA-256 hash of a stored backup.
+   *
+   * @param string $storage_key Logical storage key.
+   *
+   * @return string Lowercase hexadecimal SHA-256 hash.
+   */
+  public function getSha256(
+    string $storage_key
+  ): string {
+    return $this->storage->getSha256(
+      $storage_key
+    );
+  }
+
+  /**
    * Deletes a stored backup.
    *
    * @param string $storage_key Logical storage key.

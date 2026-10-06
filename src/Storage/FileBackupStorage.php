@@ -267,6 +267,46 @@ class FileBackupStorage implements BackupStorageInterface {
   }
 
   /**
+   * Calculates the SHA-256 hash of a stored object.
+   *
+   * The object is read sequentially by hash_file() and
+   * is never materialized completely in memory.
+   *
+   * @param string $storage_key Logical storage key.
+   *
+   * @return string Lowercase hexadecimal SHA-256 hash.
+   *
+   * @throws RuntimeException When the object does not exist
+   *                          or its hash cannot be calculated.
+   */
+  public function getSha256(
+    string $storage_key
+  ): string {
+    $path = $this->resolvePath(
+      $storage_key
+    );
+
+    if (!is_file($path)) {
+      throw new RuntimeException(
+        'Backup storage object does not exist.'
+      );
+    }
+
+    $sha256 = hash_file(
+      'sha256',
+      $path
+    );
+
+    if ($sha256 === false) {
+      throw new RuntimeException(
+        'Backup storage object SHA-256 could not be calculated.'
+      );
+    }
+
+    return $sha256;
+  }
+
+  /**
    * Deletes a stored object.
    *
    * The operation is idempotent when the object does not exist.

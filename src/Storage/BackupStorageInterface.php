@@ -52,6 +52,17 @@ interface BackupStorageInterface {
   ): int;
 
   /**
+   * Calculates the SHA-256 hash of a stored object.
+   *
+   * @param string $storage_key Logical storage key.
+   *
+   * @return string Lowercase hexadecimal SHA-256 hash.
+   */
+  public function getSha256(
+    string $storage_key
+  ): string;
+
+  /**
    * Deletes a stored object.
    *
    * The operation is idempotent when the object does not exist.

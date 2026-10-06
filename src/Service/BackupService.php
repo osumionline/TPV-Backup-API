@@ -460,6 +460,22 @@ class BackupService extends OService {
         );
       }
 
+      $stored_sha256 =
+        $this->storage_service->getSha256(
+          $storage_key
+        );
+
+      if (
+        !hash_equals(
+          $inspection['sha256'],
+          $stored_sha256
+        )
+      ) {
+        throw new RuntimeException(
+          'Stored backup SHA-256 does not match the inspected file.'
+        );
+      }
+
       if (!$backup->save()) {
         throw new RuntimeException(
           'Backup metadata could not be persisted.'
@@ -629,6 +645,23 @@ class BackupService extends OService {
     ) {
       throw new RuntimeException(
         'Backup metadata and stored file size are inconsistent.'
+      );
+    }
+
+    $stored_sha256 =
+      $this->storage_service->getSha256(
+        $backup->storage_key
+      );
+
+    if (
+      is_null($backup->sha256) ||
+      !hash_equals(
+        $backup->sha256,
+        $stored_sha256
+      )
+    ) {
+      throw new RuntimeException(
+        'Backup metadata and stored file SHA-256 are inconsistent.'
       );
     }
 

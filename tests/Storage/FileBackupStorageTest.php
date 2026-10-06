@@ -91,6 +91,16 @@ final class FileBackupStorageTest extends TestCase {
       $storage->getSize($storage_key)
     );
 
+    self::assertSame(
+      hash(
+        'sha256',
+        $contents
+      ),
+      $storage->getSha256(
+        $storage_key
+      )
+    );
+
     $stream = $storage->openReadStream(
       $storage_key
     );
