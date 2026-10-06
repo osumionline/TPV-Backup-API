@@ -206,6 +206,89 @@ final class FileBackupStorageTest extends TestCase {
   }
 
   /**
+   * Verifies that stored objects can be enumerated
+   * using normalized logical keys.
+   *
+   * @return void
+   */
+  public function testListObjectsReturnsStoredFiles(): void {
+    $first_source =
+      $this->temporary_directory
+      . DIRECTORY_SEPARATOR
+      . 'first.otpv';
+
+    $second_source =
+      $this->temporary_directory
+      . DIRECTORY_SEPARATOR
+      . 'second.otpv';
+
+    file_put_contents(
+      $first_source,
+      'first-backup'
+    );
+
+    file_put_contents(
+      $second_source,
+      'second-backup'
+    );
+
+    $storage = new FileBackupStorage(
+      $this->storage_directory
+    );
+
+    $storage->storeFile(
+      $first_source,
+      'installations/installation-a/backup-a.otpv'
+    );
+
+    $storage->storeFile(
+      $second_source,
+      'installations/installation-b/backup-b.otpv'
+    );
+
+    $objects =
+      $storage->listObjects();
+
+    self::assertCount(
+      2,
+      $objects
+    );
+
+    self::assertSame(
+      [
+        'installations/installation-a/backup-a.otpv',
+        'installations/installation-b/backup-b.otpv'
+      ],
+      array_column(
+        $objects,
+        'storageKey'
+      )
+    );
+
+    self::assertSame(
+      [
+        strlen(
+          'first-backup'
+        ),
+        strlen(
+          'second-backup'
+        )
+      ],
+      array_column(
+        $objects,
+        'sizeBytes'
+      )
+    );
+
+    foreach ($objects as $object) {
+      self::assertGreaterThan(
+        0,
+        $object['modifiedAt']
+      );
+    }
+  }
+
+  /**
    * Recursively removes a directory used by a test.
    *
    * @param string $directory Directory to remove.

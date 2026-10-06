@@ -63,6 +63,17 @@ interface BackupStorageInterface {
   ): string;
 
   /**
+   * Lists every physical object stored below the backup root.
+   *
+   * @return array<int, array{
+   *   storageKey: string,
+   *   sizeBytes: int,
+   *   modifiedAt: int
+   * }> Stored objects.
+   */
+  public function listObjects(): array;
+
+  /**
    * Deletes a stored object.
    *
    * The operation is idempotent when the object does not exist.

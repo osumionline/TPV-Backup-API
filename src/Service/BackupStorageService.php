@@ -113,6 +113,20 @@ class BackupStorageService extends OService {
   }
 
   /**
+   * Lists every object currently present
+   * in the configured backup storage.
+   *
+   * @return array<int, array{
+   *   storageKey: string,
+   *   sizeBytes: int,
+   *   modifiedAt: int
+   * }> Stored objects.
+   */
+  public function listObjects(): array {
+    return $this->storage->listObjects();
+  }
+
+  /**
    * Deletes a stored backup.
    *
    * @param string $storage_key Logical storage key.

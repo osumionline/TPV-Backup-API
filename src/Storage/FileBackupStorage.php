@@ -6,6 +6,10 @@ namespace Osumi\OsumiFramework\App\Storage;
 
 use RuntimeException;
 use Throwable;
+use FilesystemIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use SplFileInfo;
 
 class FileBackupStorage implements BackupStorageInterface {
   private string $root_path;
@@ -304,6 +308,92 @@ class FileBackupStorage implements BackupStorageInterface {
     }
 
     return $sha256;
+  }
+
+  /**
+   * Lists every regular file stored below the backup root.
+   *
+   * Symbolic links are deliberately ignored. Returned keys use
+   * forward slashes independently of the server platform.
+   *
+   * @return array<int, array{
+   *   storageKey: string,
+   *   sizeBytes: int,
+   *   modifiedAt: int
+   * }> Stored objects ordered by logical key.
+   */
+  public function listObjects(): array {
+    $objects = [];
+
+    $iterator =
+      new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator(
+          $this->root_path,
+          FilesystemIterator::SKIP_DOTS
+        ),
+        RecursiveIteratorIterator::LEAVES_ONLY
+      );
+
+    /** @var SplFileInfo $file */
+    foreach ($iterator as $file) {
+      if (
+        $file->isLink() ||
+        !$file->isFile()
+      ) {
+        continue;
+      }
+
+      $path = $file->getPathname();
+
+      $relative_path = substr(
+        $path,
+        strlen(
+          $this->root_path
+        ) + 1
+      );
+
+      if (
+        $relative_path === false ||
+        $relative_path === ''
+      ) {
+        continue;
+      }
+
+      $size = $file->getSize();
+
+      $modified_at =
+        $file->getMTime();
+
+      $objects[] = [
+        'storageKey' =>
+          str_replace(
+            DIRECTORY_SEPARATOR,
+            '/',
+            $relative_path
+          ),
+
+        'sizeBytes' =>
+          $size,
+
+        'modifiedAt' =>
+          $modified_at
+      ];
+    }
+
+    usort(
+      $objects,
+      static function(
+        array $first,
+        array $second
+      ): int {
+        return strcmp(
+          $first['storageKey'],
+          $second['storageKey']
+        );
+      }
+    );
+
+    return $objects;
   }
 
   /**

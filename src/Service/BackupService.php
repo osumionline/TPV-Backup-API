@@ -326,12 +326,14 @@ class BackupService extends OService {
       $db->commit();
     }
     catch (Throwable $exception) {
-      if ($db->inTransaction()) {
-        $db->rollBack();
-      }
+      $this->log?->error(
+        'Backup metadata was deleted but stored object cleanup failed for '
+        . "'{$storage_key}': "
+        . $exception->getMessage()
+      );
 
       throw new RuntimeException(
-        'Backup metadata could not be deleted.',
+        'Backup metadata was deleted but stored file cleanup failed.',
         0,
         $exception
       );
